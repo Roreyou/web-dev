@@ -9,8 +9,8 @@ import (
 
 func PersonInfoRoute(r *gin.Engine) {
 	adminRouter := r.Group("/admin")
-	adminRouter.Use(middlewares.AuthToken()) //中间件 用于进行权限认证
+	adminRouter.Use(middlewares.AuthToken()) //调用中间件，用于进行权限认证
 	{
-		adminRouter.GET("/info", AdminControllers.InfoAdmin) //控制器 用于调用admin的信息
+		adminRouter.GET("/info", AdminControllers.InfoAdmin) //使用控制器 用于调用admin的信息
 	}
 }
