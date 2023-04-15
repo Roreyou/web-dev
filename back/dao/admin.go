@@ -2,6 +2,7 @@ package dao
 
 import (
 	"github.com/gin-gonic/gin"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 type Admin struct {
