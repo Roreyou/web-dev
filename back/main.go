@@ -16,5 +16,8 @@ func main() {
 
 	//调用我们自己的route包中的来创建路由
 	r := router.SetupRouter()
+	dao.Openmysql()     //打开数据库
+	router.Gethtml(r)   //显示登陆页面
+	router.CheckUser(r) //登陆判断
 	r.Run(":8080")
 }
