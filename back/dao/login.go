@@ -41,8 +41,9 @@ func FindUsername(name string) (user User) { //查找到用户名相同的用户
 	return auser
 }
 
-func CreateaUser(name string, password string) { //创建一个用户
+func CreateaUser(name string, password string) (auser User) { //创建一个用户
 	db := Openmysql() //获取数据库对象
 	user := User{Username: name, Password: password}
-	db.create(&user)
+	db.Create(&user)
+	return user
 }
