@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"strings"
 
@@ -30,38 +31,17 @@ func AuthToken() gin.HandlerFunc {
 	}
 }
 
-func getToken(c *gin.Context)(*User,error){
-	if token , ok:= c.Request.Header{"Token"}; ok{
-		ss := strings.Split(token[0],".")
-		at:=&User{}
-		payload,err := base64.RawURLEncoding.DecodeString(ss[1])
-		if err!= nil{
-			return nil,err
-		}
-		err = json.Unmarshal(payload,at)
-		return at,nil
-	}
-}
-
-// UserInfo 当前用户登录信息
-func UserInfo(c *gin.Context) *User {
-	token := c.Request.Header.Get("token")
-	user := &User{}
-	if token == "" {
-		return user
-	} else {
-		claims, err := ParseToken(token)
+func GetToken(c *gin.Context) (*User, error) {
+	if token1, ok := c.Request.Header["Token"]; ok {
+		ss := strings.Split(token1[0], ".")
+		at := &User{}
+		payload, err := base64.RawURLEncoding.DecodeString(ss[1])
 		if err != nil {
-			return user
-		} else {
-			user.ID = claims.ID
-			user.Name = claims.Name
-			return user
+			return nil, err
 		}
+		err = json.Unmarshal(payload, at)
+		return at, nil
+	} else {
+		return nil, gin.Error{}
 	}
-}
-
-// UserId 当前用户 ID
-func UserId(c *gin.Context) int64 {
-	return UserInfo(c).ID
 }

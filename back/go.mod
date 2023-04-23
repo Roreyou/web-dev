@@ -3,9 +3,9 @@ module back
 go 1.20
 
 require (
-	github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1
 	github.com/gin-gonic/gin v1.9.0
 	github.com/jinzhu/gorm v1.9.16
+	github.com/langwan/go-jwt-hs256 v1.0.1
 )
 
 require (

@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"back/dao"
+	"back/middlewares"
 
 	"github.com/gin-gonic/gin"
 	"github.com/langwan/go-jwt-hs256"
@@ -42,7 +43,7 @@ func Showhtml(c *gin.Context) { //显示登陆页面
 }
 
 func TestMiddler(c *gin.Context) { //测试中间件
-	at, err := middlewares.getToken(c) //获取token
+	at, err := middlewares.GetToken(c) //获取token
 	if err != nil {
 		c.AbortWithError(500, err)
 	} else {
