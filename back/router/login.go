@@ -15,6 +15,8 @@ func CheckUserRouter(r *gin.Engine) { //登陆验证
 	r.POST("/enter", controller.LoginInfoController)
 }
 
+/*
 func TestMiddlerRouter(r *gin.Engine) { //测试中间件
-	r.POST("/doing", controller.TestMiddler)
+	r.POST("/doing", middlewares.UseMiddler)
 }
+*/

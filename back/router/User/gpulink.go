@@ -1,4 +1,4 @@
-package admin
+package User
 
 import (
 	"back/controller"

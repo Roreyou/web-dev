@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"back/dao"
-	"back/middlewares"
 
 	"github.com/gin-gonic/gin"
 	"github.com/langwan/go-jwt-hs256"
@@ -40,13 +39,4 @@ func LoginInfoController(c *gin.Context) { //处理登陆信息
 
 func Showhtml(c *gin.Context) { //显示登陆页面
 	c.HTML(http.StatusOK, "login.html", nil) //访问/login时呈现出login.html
-}
-
-func TestMiddler(c *gin.Context) { //测试中间件
-	at, err := middlewares.GetToken(c) //获取token
-	if err != nil {
-		c.AbortWithError(500, err)
-	} else {
-		c.JSON(http.StatusOK, at)
-	}
 }

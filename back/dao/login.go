@@ -19,7 +19,7 @@ type User struct { //定义数据库模型
 
 func Openmysql() (db1 *gorm.DB) { //打开数据库
 	//连接MYSQL数据库
-	db, err := gorm.Open("mysql", "root:123456@(127.0.0.1)/testsystem?charset-utf8mb4&parseTime=True&loc=Local")
+	db, err := gorm.Open("mysql", "root:0921@(127.0.0.1)/web_database?charset-utf8mb4&parseTime=True&loc=Local")
 	//parseTime表示将数据库中时间类型的解析为时间，loc表示解析本地时间
 	if err != nil { //判断是否打开错误
 		panic(err)
