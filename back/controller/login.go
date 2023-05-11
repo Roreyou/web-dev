@@ -1,7 +1,11 @@
 package controller
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
+	"fmt"
 	"net/http"
+	"strconv"
 
 	"back/dao"
 
@@ -13,18 +17,24 @@ import (
 func LoginInfoController(c *gin.Context) { //处理登陆信息
 	//从请求中读取数据
 	//获取来自html中的数据,用户名和密码
-	name := c.PostForm("username")
-	password := c.PostForm("password")
-	user := dao.FindUsername(name) //找到用户名相同的用户
+	db := dao.Openmysql()
+	id := c.PostForm("user_id")
+	user_id, _ := strconv.ParseInt(id, 10, 64) //要转化成int64类型
+	password := c.PostForm("user_password")
+	hashed := sha256.Sum256([]byte(password))
+	hashed_password := hex.EncodeToString(hashed[:])
+	fmt.Println(user_id)
+	fmt.Println(password)
+	user := dao.FindUser(user_id, db) //找到用户名相同的用户
 
-	if user.ID == 0 { //该用户不存在则报错
+	if user.User_id == 0 { //该用户不存在则报错
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"fail": "该用户名不存在",
 		})
 		return
 	}
 	sign, _ := jwt.Sign(user)
-	if user.Password == password { //密码正确
+	if user.User_password == hashed_password { //密码正确
 		c.JSON(http.StatusOK, struct {
 			Token string `json:"token"`
 		}{Token: sign})

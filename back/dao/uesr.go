@@ -66,7 +66,7 @@ func FindUserPassword(userid int64, db *gorm.DB) string { //查找到用户名�
 
 func ChangeUserPassword(c *gin.Context) bool {
 	db := Openmysql()
-	// add_user(db)
+	add_user(db)
 	keywords := c.PostFormArray("keywords")
 
 	print(keywords[0], "    ")
