@@ -12,7 +12,7 @@ func GethtmlRouter(r *gin.Engine) { //显示登陆页面
 }
 
 func CheckUserRouter(r *gin.Engine) { //登陆验证
-	r.POST("/enter", controller.LoginInfoController)
+	r.POST("/user", controller.LoginInfoController)
 }
 
 /*
