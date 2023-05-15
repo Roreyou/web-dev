@@ -1,10 +1,15 @@
 package services
 
-//"golang.org/x/crypto/ssh"
+import (
+	"fmt"
 
-func GreateDocker() string {
+	"golang.org/x/crypto/ssh"
+)
+
+func GreateDocker() int {
 	// SSH连接信息
-	/*sshConfig := &ssh.ClientConfig{
+
+	sshConfig := &ssh.ClientConfig{
 		User: "zhangn279",
 		Auth: []ssh.AuthMethod{
 			ssh.Password("123456"),
@@ -27,12 +32,12 @@ func GreateDocker() string {
 	defer session.Close()
 
 	// 在远程服务器上运行Docker命令来创建一个新的容器
-	cmd := "docker run --name my-container -itd your_image_name /bin/bash"
-	output, err := session.CombinedOutput(cmd)
+	//cmd := "docker run --name my-container -itd your_image_name /bin/bash"
+	output, err := session.CombinedOutput("ls -lh")
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(string(output))*/
-
-	return "ssh"
+	fmt.Println("------------连接----------成功")
+	fmt.Println(string(output))
+	return 0
 }
