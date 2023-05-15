@@ -83,8 +83,12 @@ func UpdateRecord(user_id int64, end_time time.Time) { //退出容器后更新�
 	if err != nil {
 		panic(err)
 	} else { //更新记录
-		db.Table("used_record").Where("user_id=? and start_time = ?", user_id, record.Start_time).Update("end_time", end_time)
-		db.Table("used_record").Where("user_id=? and start_time = ?", user_id, record.Start_time).Update("rent_time", end_time.Sub(record.Start_time))
-		db.Table("used_record").Where("user_id=? and start_time = ?", user_id, record.Start_time).Update("used_time", record.Used_time-record.Rent_time+end_time.Sub(record.Start_time))
+		db.Table("used_record").Where("user_id= ? and start_time = ?", user_id, record.Start_time).Update("end_time", end_time)
+		db.Table("used_record").Where("user_id= ? and start_time = ?", user_id, record.Start_time).Update("rent_time", end_time.Sub(record.Start_time))
+		db.Table("used_record").Where("user_id= ? and start_time = ?", user_id, record.Start_time).Update("used_time", record.Used_time-record.Rent_time+end_time.Sub(record.Start_time))
 	}
+}
+func UpdateContainerStatus(status int, container Container) { //更新容器的状态
+	db := Openmysql()
+	db.Table("containers").Where("image_id= ?", container.Image_ID).Update("container_status", container.Container_status)
 }

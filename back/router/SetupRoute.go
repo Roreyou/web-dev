@@ -16,6 +16,7 @@ func SetupRouter() *gin.Engine {
 	User.User_changePasswordRoute(r)
 	User.GpulinkRoute(r)
 	User.EnterContainerRoute(r)
+	User.DeleteContainerRoute(r)
 	User.ExitContainerRoute(r)
 	return r
 }
