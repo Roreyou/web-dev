@@ -5,6 +5,8 @@ import (
 
 	"back/dao"
 
+	"back/services"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,5 +15,5 @@ func Show(c *gin.Context) {
 }
 
 func Link(c *gin.Context) {
-	c.JSON(http.StatusOK, "将用户与对应机器相连")
+	c.JSON(http.StatusOK, services.GreateDocker())
 }
