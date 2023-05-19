@@ -10,7 +10,7 @@ import (
 
 func InfoUserControl(c *gin.Context) {
 	/*
-		//该函数用于调用dao里面封装的用于调用数据信息的函数
+		//用token的测试版本
 		_, err := middlewares.GetToken(c) //获取token
 		if err != nil {
 			//c.AbortWithError(500, err)
@@ -25,7 +25,7 @@ func InfoUserControl(c *gin.Context) {
 
 func PasswordUserControl(c *gin.Context) {
 	/*
-		//该函数用于调用dao里面封装的用于调用数据信息的函数
+		//用token的测试版本
 		_, err := middlewares.GetToken(c) //获取token
 		if err != nil {
 			//c.AbortWithError(500, err)

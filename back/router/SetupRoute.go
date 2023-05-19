@@ -2,6 +2,7 @@ package router
 
 import (
 	"back/middlewares"
+	"back/router/Admin"
 	"back/router/User"
 
 	"github.com/gin-gonic/gin"
@@ -15,5 +16,7 @@ func SetupRouter() *gin.Engine {
 	User.UserInfoRoute(r)
 	User.User_changePasswordRoute(r)
 	User.GpulinkRoute(r)
+	Admin.InitPasswordRoute(r)
+
 	return r
 }

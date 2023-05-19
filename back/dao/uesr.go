@@ -66,21 +66,20 @@ func FindUserPassword(userid int64, db *gorm.DB) string { //查找到用户名�
 
 func ChangeUserPassword(c *gin.Context) bool {
 	db := Openmysql()
-	add_user(db)
-	keywords := c.PostFormArray("keywords")
+	//add_user(db)
+	/*
+		keywords := c.PostFormArray("keywords")
 
-	print(keywords[0], "    ")
-	print(keywords[1], "    ")
-	print(keywords[2], "    ")
-
-	userid_string := keywords[0]
-	get_olduserPassword := keywords[1]
+		print(keywords[0], "    ")
+		print(keywords[1], "    ")
+		print(keywords[2], "    ")
+		//userid_string := c.PostForm("id") //返回的是string类型
+	*/
+	userid_string := c.PostForm("user_id")
+	get_olduserPassword := c.PostForm("user_password")
 	user_id, _ := strconv.ParseInt(userid_string, 10, 64) //要转化成int64类型
 	old_userPassword := FindUserPassword(user_id, db)
 
-	print("old_userPassword: ", old_userPassword)
-	fmt.Printf("\n")
-	print(keywords[2])
 	hashedPassword := sha256.Sum256([]byte(get_olduserPassword))
 	get_hashedPassword := hex.EncodeToString(hashedPassword[:])
 
@@ -89,7 +88,7 @@ func ChangeUserPassword(c *gin.Context) bool {
 	}
 	//能执行到这里说明输入的原密码与数据库一致，允许修改密码
 
-	new_Password := keywords[2]
+	new_Password := c.PostForm("new_password")
 	new_hashedPassword := sha256.Sum256([]byte(new_Password))
 	new_dbpassword := hex.EncodeToString(new_hashedPassword[:])
 	err := db.Table("user_info").Where("user_id = ?", user_id).Update("user_password", new_dbpassword).Error
