@@ -3,7 +3,6 @@ package dao
 import (
 	"fmt"
 
-	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql" //前面加下划线表示没有直接使用
 )
 
@@ -17,7 +16,7 @@ type User struct { //定义数据库模型
 	Password string `json:"password"`
 }
 
-func Openmysql() (db1 *gorm.DB) { //打开数据库
+/*func Openmysql() (db1 *gorm.DB) { //打开数据库
 	//连接MYSQL数据库
 	db, err := gorm.Open("mysql", "root:0921@(127.0.0.1)/web_database?charset-utf8mb4&parseTime=True&loc=Local")
 	//parseTime表示将数据库中时间类型的解析为时间，loc表示解析本地时间
@@ -30,7 +29,7 @@ func Openmysql() (db1 *gorm.DB) { //打开数据库
 	// u1 := User{1, "小王子", "123"}
 	// db.Create(&u1)
 	return db
-}
+}*/
 
 func FindUsername(name string) (user User) { //查找到用户名相同的用户
 	var auser User

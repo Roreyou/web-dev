@@ -15,13 +15,7 @@ type Gpu struct {
 
 func GetGpuInfo(c *gin.Context) *Gpu {
 	//连接sql数据库
-	/*db, err := gorm.Open("mysql", "root:0921@(127.0.0.1:3306)/web_database?charset=utf8mb4&parseTime=True&loc=Local")
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close() //把数据库的连接关闭掉*/
 	db := Openmysql()
-
 	db.AutoMigrate(&Gpu{}) //自动迁移，使结构体何数据库对应
 	//u1 := Gpu{Server_id: 1, Server_type: "RTX3080", Server_size: 10, Server_state: 0, Server_flag: false}
 	//db.Create(&u1) //增加数据

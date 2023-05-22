@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 
 	"back/dao"
@@ -15,5 +16,8 @@ func Show(c *gin.Context) {
 }
 
 func Link(c *gin.Context) {
-	c.JSON(http.StatusOK, services.GreateDocker())
+	machineid := c.Query("id")
+	fmt.Println("看一下id")
+	fmt.Println(machineid)
+	c.JSON(http.StatusOK, services.GreateDocker(machineid))
 }
