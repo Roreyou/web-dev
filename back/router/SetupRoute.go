@@ -2,6 +2,7 @@ package router
 
 import (
 	"back/middlewares"
+	"back/router/Admin"
 	"back/router/User"
 
 	"github.com/gin-gonic/gin"
@@ -12,7 +13,13 @@ func SetupRouter() *gin.Engine {
 	r.Use(middlewares.AuthToken())
 	GethtmlRouter(r)
 	CheckUserRouter(r)
-	User.UserInfoRoute(r) // 调用我的adminIndoRoute来注册中间件auth，并创建一个路由，访问admin的个人信息
+	User.UserInfoRoute(r)
+	User.User_changePasswordRoute(r)
 	User.GpulinkRoute(r)
+	Admin.InitPasswordRoute(r)
+
+	User.EnterContainerRoute(r)
+	User.DeleteContainerRoute(r)
+	User.ExitContainerRoute(r)
 	return r
 }
