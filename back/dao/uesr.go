@@ -4,7 +4,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -13,20 +12,20 @@ import (
 )
 
 type User_Info struct {
-	User_id       int64  `json:"user_id" db:"user_id"`
+	User_id       int    `json:"user_id" db:"user_id"`
 	User_Name     string `json:"user_name" db:"user_name"`
 	Real_name     string `json:"real_name" db:"real_name"`
 	User_password string `json:"user_password" db:"user_password"`
 }
 
 type Admin_Info struct {
-	Admin_id       int64  `json:"user_id"`
+	Admin_id       int    `json:"user_id"`
 	Admin_Name     string `json:"user_name"`
 	Admin_RealName string `json:"real_Name"`
 	Admin_Password string `json:"user_password"`
 }
 
-func FindUser(userid int64, db *gorm.DB) (user User_Info) { //查找到用户名相同的用户
+func FindUser(userid int, db *gorm.DB) (user User_Info) { //查找到用户名相同的用户
 	var saveInfo User_Info
 	//查找输入用户名是否存在
 	tableName := db.Model(&User_Info{})
@@ -41,19 +40,14 @@ func GetUserInfo(c *gin.Context) *User_Info {
 	db := Openmysql()
 	userid_string := c.PostForm("id") //返回的是string类型
 
-	user_id, _ := strconv.ParseInt(userid_string, 10, 64) //要转化成int64类型
+	user_id, _ := strconv.Atoi(userid_string) //要转化成int类型
 
 	get_info := FindUser(user_id, db)
 
-	if get_info.User_id == 0 { //该用户不存在则报错
-		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, gin.H{
-			"fail": "该用户名不存在",
-		})
-	}
 	return &get_info
 }
 
-func FindUserPassword(userid int64, db *gorm.DB) string { //查找到用户名相同的用户
+func FindUserPassword(userid int, db *gorm.DB) string { //查找到用户名相同的用户
 	var saveInfo User_Info
 	//查找输入用户名是否存在
 	db.Table("user_info").Where("user_id = ?", userid).Take(&saveInfo)
@@ -77,7 +71,7 @@ func ChangeUserPassword(c *gin.Context) bool {
 	*/
 	userid_string := c.PostForm("user_id")
 	get_olduserPassword := c.PostForm("user_password")
-	user_id, _ := strconv.ParseInt(userid_string, 10, 64) //要转化成int64类型
+	user_id, _ := strconv.Atoi(userid_string) //要转化成int类型
 	old_userPassword := FindUserPassword(user_id, db)
 
 	hashedPassword := sha256.Sum256([]byte(get_olduserPassword))
@@ -99,4 +93,39 @@ func ChangeUserPassword(c *gin.Context) bool {
 		return true
 	}
 
+}
+
+func FindRecord(userid int64, db *gorm.DB) (userecord Used_Record) {
+	var record Used_Record
+	//查找输入用户名是否存在
+	db.Model(&Used_Record{})
+	db.Table("Used_Record").Where("user_id = ?", userid).First(&record)
+	fmt.Printf("u:%#v\n", record)
+	return record
+}
+
+func Get_Recording(c *gin.Context) *Used_Record {
+	db := Openmysql()
+	// add_time()                                            //测试
+	userid_string := c.PostForm("id")                     //返回的是string类型
+	user_id, _ := strconv.ParseInt(userid_string, 10, 64) //要转化成int64类型
+	recording_info := FindRecord(user_id, db)
+	return &recording_info
+}
+
+func add_time() {
+	db := Openmysql()
+	db.Model(&Used_Record{})
+	var record Used_Record
+	db.Table("used_record").Where("user_id= ?", 1).First(&record)
+	dtime := record.End_time.Sub(record.Start_time).String()
+	db.Table("used_record").Where("user_id= ?", 1).Update("rent_time", dtime)
+	fmt.Println("时间间隔：", dtime)
+	/*
+		tt1 := time.Now()
+		db.Table("used_record").Where("user_id= ?", 1).Update("start_time", tt1)
+		db.Table("used_record").Where("user_id= ?", 1).Update("end_time", tt1)
+		db.Table("used_record").Where("user_id= ?", 2).Update("start_time", tt1)
+		db.Table("used_record").Where("user_id= ?", 2).Update("end_time", tt1)
+	*/
 }

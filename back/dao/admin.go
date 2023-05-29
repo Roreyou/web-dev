@@ -7,35 +7,35 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 )
 
-func add_user(db *gorm.DB) {
-	db.AutoMigrate(&User_Info{})
-	//插入:
-	hdmpassword := "hdm"
-	lxhpassword := "lxh1"
+/*
+	func add_user(db *gorm.DB) {
+		db.AutoMigrate(&User_Info{})
+		//插入:
+		hdmpassword := "hdm"
+		lxhpassword := "lxh1"
 
-	hashedPassword_hdm := sha256.Sum256([]byte(hdmpassword))
-	get_hdmPassword := hex.EncodeToString(hashedPassword_hdm[:])
+		hashedPassword_hdm := sha256.Sum256([]byte(hdmpassword))
+		get_hdmPassword := hex.EncodeToString(hashedPassword_hdm[:])
 
-	hashedPassword_lxh := sha256.Sum256([]byte(lxhpassword))
-	get_lxhPassword := hex.EncodeToString(hashedPassword_lxh[:])
+		hashedPassword_lxh := sha256.Sum256([]byte(lxhpassword))
+		get_lxhPassword := hex.EncodeToString(hashedPassword_lxh[:])
 
-	u1 := User_Info{1, "小明", "黄大明", get_hdmPassword}
-	u2 := User_Info{2, "小红", "刘大红", get_lxhPassword}
-	// 创建记录
+		u1 := User_Info{1, "小明", "黄大明", get_hdmPassword}
+		u2 := User_Info{2, "小红", "刘大红", get_lxhPassword}
+		// 创建记录
 
-	db.Table("user_info").Create(&u1)
-	db.Table("user_info").Create(&u2)
+		db.Table("user_info").Create(&u1)
+		db.Table("user_info").Create(&u2)
 
-	fmt.Println("完成！")
-}
-
+		fmt.Println("完成！")
+	}
+*/
 func Init_password(c *gin.Context) bool {
 	db := Openmysql()
 	userid_string := c.PostForm("user_id")
-	user_id, _ := strconv.ParseInt(userid_string, 10, 64) //要转化成int64类型
+	user_id, _ := strconv.Atoi(userid_string) //要转化成int类型
 	user := FindUser(user_id, db)
 	if user.User_id == 0 { //该用户不存在则报错
 		return false
