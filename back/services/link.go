@@ -12,7 +12,7 @@ func GreateDocker() int {
 	sshConfig := &ssh.ClientConfig{
 		User: "zhangn279",
 		Auth: []ssh.AuthMethod{
-			ssh.Password("123456"),
+			ssh.Password("ssezhangneng@972"),
 		},
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}

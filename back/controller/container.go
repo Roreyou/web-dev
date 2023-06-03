@@ -38,14 +38,14 @@ func ConnectContainer(c *gin.Context) {
 		} else { //容器存在
 			//ssh连接信息
 			config := &ssh.ClientConfig{
-				User: "your_username",
+				User: "zhangn279", //服务器的账号
 				Auth: []ssh.AuthMethod{
-					ssh.Password("your_password"),
+					ssh.Password("ssezhangneng@972"), //服务器密码
 				},
 				HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 			}
 			//连接ssh服务器
-			client, err := ssh.Dial("tcp", "your_server_address:22", config)
+			client, err := ssh.Dial("tcp", "ssh.schoolresearch.one:21110", config)
 			if err != nil {
 				log.Fatal("Failed to dial: ", err)
 			}
@@ -71,10 +71,11 @@ func ConnectContainer(c *gin.Context) {
 		}
 	}
 }
-func ExitContainer(c *gin.Context) {
+func ExitContainer(c *gin.Context) { //
 	keywords := c.PostFormArray("keywords") //获取输入数据
 	userid_string := keywords[0]
 	user_id, _ := strconv.ParseInt(userid_string, 10, 64) //要转化成int64类型
+	container := dao.FindContainer(user_id)               //找到对应容器
 	config := &ssh.ClientConfig{
 		User: "your_username",
 		Auth: []ssh.AuthMethod{
@@ -88,7 +89,8 @@ func ExitContainer(c *gin.Context) {
 		log.Fatal("Failed to dial: ", err)
 	}
 	defer client.Close()
-	cmd := "exit" //退出容器的命令
+	str := strconv.Itoa(container.Image_ID) //将整数转为字符串
+	cmd := "docker stop " + str             //关闭容器的命令
 	//创建新的会话
 	session, err := client.NewSession()
 	if err != nil {
