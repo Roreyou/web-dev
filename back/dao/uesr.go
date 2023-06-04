@@ -36,15 +36,15 @@ func FindUser(userid int, db *gorm.DB) (user User_Info) { //查找到用户名�
 	return saveInfo
 }
 
-func GetUserInfo(c *gin.Context) *User_Info {
+func GetUserInfo(c *gin.Context) User_Info {
 	db := Openmysql()
-	userid_string := c.PostForm("id") //返回的是string类型
+	userid_string := c.PostForm("user_id") //返回的是string类型
 
 	user_id, _ := strconv.Atoi(userid_string) //要转化成int类型
 
 	get_info := FindUser(user_id, db)
 
-	return &get_info
+	return get_info
 }
 
 func FindUserPassword(userid int, db *gorm.DB) string { //查找到用户名相同的用户
