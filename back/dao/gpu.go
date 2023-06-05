@@ -5,7 +5,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
-type Gpu struct {
+type Server_Info struct {
 	Server_id    int    `json:"server_id"`
 	Server_type  string `json:"sever_type"`
 	Server_size  int    `json:"server_size"`
@@ -13,14 +13,15 @@ type Gpu struct {
 	Server_flag  bool   `json:"sever_flag"`
 } //操作gpu信息的结构体
 
-func GetGpuInfo(c *gin.Context) *Gpu {
+func (Server_Info) TableName() string {
+	return "server_info"
+}
+
+func GetGpuInfo(c *gin.Context) *[]Server_Info {
 	//连接sql数据库
 	db := Openmysql()
-	db.AutoMigrate(&Gpu{}) //自动迁移，使结构体何数据库对应
-	//u1 := Gpu{Server_id: 1, Server_type: "RTX3080", Server_size: 10, Server_state: 0, Server_flag: false}
-	//db.Create(&u1) //增加数据
-	var u2 Gpu
-	db.First(&u2) //查询数据
-	//db.Model(&u2).Update("flag", false) //更新数据
-	return &u2 //返回数据
+	db.AutoMigrate(&Server_Info{}) //自动迁移，使结构体何数据库对应
+	var u2 []Server_Info
+	db.Find(&u2) //查询数据
+	return &u2   //返回数据
 }

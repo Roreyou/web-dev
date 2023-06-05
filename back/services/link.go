@@ -1,7 +1,6 @@
 package services
 
 import (
-	"back/dao"
 	"fmt"
 
 	"golang.org/x/crypto/ssh"
@@ -27,11 +26,11 @@ func SSHlink() *ssh.Client {
 		panic(err)
 	}
 	defer session.Close()*/
-	fmt.Println("--------连接成功-------------")
+
 	return sshClient
 }
 
-func IfmachineAvailable(id string) bool {
+/*func IfmachineAvailable(id string) bool {
 	db := dao.Openmysql()
 	var gpul []dao.Gpu
 	sql := "select server_id,server_type,server_size,server_state,server_flag from gpus where server_id=1 "
@@ -42,10 +41,10 @@ func IfmachineAvailable(id string) bool {
 	}
 	fmt.Println("select succ:", gpul)
 	return false
-}
+}*/
 
 func GreateDocker(mid string) int {
-	if IfmachineAvailable(mid) {
+	/*if IfmachineAvailable(mid) {
 		return 1
 	}
 	/*	// SSH连接信息*/
@@ -64,8 +63,8 @@ func GreateDocker(mid string) int {
 	}
 	defer sshClient.Close()
 	//sshClient := SSHlink()
-
-	// 创建新的会话
+	fmt.Println("--------连接成功-------------")
+	// 创建新的会话  15acc1083d3a
 	session, err := sshClient.NewSession()
 	if err != nil {
 		panic(err)
@@ -75,7 +74,7 @@ func GreateDocker(mid string) int {
 	//session := SSHlink()
 	// 在远程服务器上运行Docker命令来创建一个新的容器
 	//cmd := "docker run --name my-container -itd your_image_name /bin/bash"
-	output, err := session.CombinedOutput("ls")
+	output, err := session.CombinedOutput("docker -v")
 	if err != nil {
 		panic(err)
 	}
