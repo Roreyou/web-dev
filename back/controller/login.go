@@ -19,7 +19,7 @@ func LoginInfoController(c *gin.Context) { //处理登陆信息
 	//获取来自html中的数据,用户名和密码
 	db := dao.Openmysql()
 	id := c.PostForm("user_id")
-	user_id, _ := strconv.ParseInt(id, 10, 64) //要转化成int64类型
+	user_id, _ := strconv.Atoi(id) //要转化成int类型
 	password := c.PostForm("user_password")
 	hashed := sha256.Sum256([]byte(password))
 	hashed_password := hex.EncodeToString(hashed[:])
@@ -35,9 +35,15 @@ func LoginInfoController(c *gin.Context) { //处理登陆信息
 	}
 	sign, _ := jwt.Sign(user)
 	if user.User_password == hashed_password { //密码正确
-		c.JSON(http.StatusOK, struct {
-			Token string `json:"token"`
-		}{Token: sign})
+		saveInfo := dao.GetUserInfo(c)
+		data := struct {
+			Token    string        `json:"token"`
+			UserInfo dao.User_Info `json:"UsrInfo"`
+		}{
+			Token:    sign,
+			UserInfo: saveInfo,
+		}
+		c.JSON(http.StatusOK, data)
 		return
 	} else { //密码不正确
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
