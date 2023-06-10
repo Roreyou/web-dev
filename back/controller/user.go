@@ -80,12 +80,6 @@ func Record_controller(c *gin.Context) {
 	//不用token的测试版本
 
 	recording_info := dao.Get_Recording(c)
-	if recording_info.User_id == 0 { //该用户不存在则报错
-		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, gin.H{
-			"fail": "该用户不存在",
-		})
-	} else {
-		c.JSON(http.StatusOK, recording_info)
-	}
+	c.JSON(http.StatusOK, recording_info)
 
 }

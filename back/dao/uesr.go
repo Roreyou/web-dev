@@ -95,22 +95,22 @@ func ChangeUserPassword(c *gin.Context) bool {
 
 }
 
-func FindRecord(userid int64, db *gorm.DB) (userecord Used_Record) {
-	var record Used_Record
+func FindRecord(userid int64, db *gorm.DB) (userecord []Used_Record) {
+	var record []Used_Record
 	//查找输入用户名是否存在
 	db.Model(&Used_Record{})
-	db.Table("Used_Record").Where("user_id = ?", userid).First(&record)
+	db.Table("Used_Record").Where("user_id = ?", userid).Find(&record)
 	fmt.Printf("u:%#v\n", record)
 	return record
 }
 
-func Get_Recording(c *gin.Context) *Used_Record {
+func Get_Recording(c *gin.Context) []Used_Record {
 	db := Openmysql()
 	// add_time()                                            //测试
 	userid_string := c.PostForm("id")                     //返回的是string类型
 	user_id, _ := strconv.ParseInt(userid_string, 10, 64) //要转化成int64类型
 	recording_info := FindRecord(user_id, db)
-	return &recording_info
+	return recording_info
 }
 
 func add_time() {
