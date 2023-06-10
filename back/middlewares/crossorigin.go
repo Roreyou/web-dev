@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -18,14 +19,16 @@ func CorsHander() gin.HandlerFunc {
 		// 可选，是否允许后续请求携带认证信息Cookir，该值只能是true，不需要则不设置
 		c.Writer.Header().Set("Access-Control-Expose-Headers", "Access-Control-Allow-Headers, Token")
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
-
-		if c.Request.Method == "OPRIONS" {
+		c.Writer.Header().Set("Access-Control-Max-Age", "86400")
+		if c.Request.Method == "OPTIONS" {
+			print("进入options")
+			fmt.Println(c)
 			c.AbortWithStatus(http.StatusNoContent)
-			return
+		} else {
+			//继续处理下面的请求
+			c.Next()
 		}
 
-		//继续处理下面的请求
-		c.Next()
 	}
 
 }
