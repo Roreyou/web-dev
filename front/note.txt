@@ -1,2 +1,0 @@
-说明：这个文件夹用于前端开发使用
-# 使用了go mod init github.com/Roreyou/web-dev 创建出go.mod

@@ -1,0 +1,155 @@
+<template>
+  <el-form
+    ref="form"
+    label-width="70px"
+    :inline="true"
+    class="login-container"
+    :model="form"
+    :rules="rules"
+  >
+    <h3 class="login_title">GPU管理系统登录</h3>
+    <el-form-item label="学号" prop="user_id">
+      <el-input v-model="form.user_id" placeholder="请输入学号"></el-input>
+    </el-form-item>
+    <el-form-item label="密码" prop="user_password">
+      <el-input
+        type="password"
+        v-model="form.user_password"
+        placeholder="请输入密码"
+      ></el-input>
+    </el-form-item>
+    <el-form-item>
+      <el-button
+        @click="submit"
+        style="margin-left: 105px; margin-top: 10px"
+        type="primary"
+        >登录</el-button
+      >
+    </el-form-item>
+  </el-form>
+</template>
+
+<script>
+
+import $ from 'jquery'
+import VueRouter from 'vue-router'
+import Manage from '../views/Manage.vue'
+
+export default {
+  data() {
+    
+    return {
+      user_id:"",
+      user_name:"",
+      real_name:"",
+      token:"",
+      user_password:"",
+      form: {
+        user_id: "",
+        user_password: "",
+      },
+      rules: {
+        user_id: [
+          { required: true, trigger: "blur", message: "该栏不能为空" },
+        ],
+        user_password: [
+          { required: true, trigger: "blur", message: "该栏不能为空" },
+        ],
+      },
+    };
+  },
+  methods: {
+    
+    submit() {
+       // 发送 POST 请求验证用户身份
+       $.ajax({
+        type: "POST",
+        url: "http://127.0.0.1:8080/user",
+        data: {
+            user_id: this.form.user_id,
+            user_password: this.form.user_password,
+            },
+            success: (response) => {
+      console.log(response);
+      // 获取用户信息
+      const token = response.token;
+      const user_id = response.UserInfo.user_id;
+      const user_name = response.UserInfo.user_name;
+      const real_name = response.UserInfo.real_name;
+      const user_password = response.UserInfo.user_password;
+      // 存储用户信息
+      sessionStorage.setItem("token", token);
+      sessionStorage.setItem("user_id", user_id);
+      sessionStorage.setItem("user_name", user_name);
+      sessionStorage.setItem("real_name", real_name);
+      sessionStorage.setItem("user_password", user_password);
+      // 将用户重定向到首页或指定页面
+      this.$router.push("/manage");
+    },
+    error: function(xhr, status, error) {
+    // 请求失败的处理逻辑
+    console.log("Error:", error);
+    alert("登录失败，请检查用户名和密码是否正确");
+  }
+      });
+   
+
+        //    .then( 
+        //     console.log("验证的id"),
+        //     console.log(this.form.user_id),
+        //     (response) => {
+        //     // 登录成功，生成并存储 token,id,password
+        //     //保存数据语法：sessionStorage.setItem("key", "value");
+        //     //读取数据语法：var lastname = sessionStorage.getItem("key");
+        //     const token = response.data.Token;
+        //     const user_id = response.data.UserInfo.User_id;
+        //     const user_name = response.data.UserInfo.User_name;
+        //     const real_name = response.data.UserInfo.Real_name;
+        //     const user_password = response.data.UserInfo.User_password ;
+        //     console.log("验证的信息");
+        //     console.log(token);
+        //     console.log(user_id);
+        //     sessionStorage.setItem("token", token);
+        //     sessionStorage.setItem("user_id",user_id);
+        //     sessionStorage.setItem("user_name",user_name);
+        //     sessionStorage.setItem("real_name",real_name);
+        //     sessionStorage.setItem("user_password",user_password);
+
+        //   //    // 将用户重定向到首页或指定页面
+        //   //   this.$router.push("/manage");
+        //   //  },
+        //   //  (error) => {
+        //   //  // 验证失败，提示错误消息
+        //   //   console.log(error);
+        //   //   alert("登录失败，请检查用户名和密码是否正确");
+        //   //   }
+        //  )
+        //  .catch(function (error) {
+        //  console.log(error);
+        //     });
+
+      },
+  },
+  
+};
+</script>
+<style lang="less" scoped>
+.login-container {
+  width: 350px;
+  border: 1px solid #eaeaea;
+  margin: 180px auto;
+  padding: 35px 35px 15px 35px;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 0 0 25px #cac6c6;
+  box-sizing: border-box;
+  .login_title {
+    text-align: center;
+    margin-bottom: 40px;
+    color: #505458;
+  }
+  .el-input {
+    width: 198px;
+  }
+}
+</style>
