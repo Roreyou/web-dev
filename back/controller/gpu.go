@@ -19,10 +19,12 @@ func Link(c *gin.Context) {
 	machineid := c.Query("server_id")
 	user_id := c.Query("user_id")
 	docker_id := c.Query("docker_id")
+	user_password := c.Query("user_password")
 	fmt.Println(machineid)
 	fmt.Println(user_id)
 	fmt.Println(docker_id)
-	result := services.GreateDocker(machineid, user_id, docker_id)
+	fmt.Println(user_password)
+	result := services.GreateDocker(machineid, user_id, docker_id, user_password)
 	if result == 0 {
 		c.JSON(http.StatusOK, gin.H{
 			"Success": "创建成功",

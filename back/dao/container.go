@@ -17,11 +17,17 @@ type Used_Record struct {
 }
 
 type Container struct {
-	Image_ID           int    `json:"容器ID"`
+	Image_ID           int    `json:"镜像ID"`
 	Container_password string `json:"容器密码"`
+	Container_port     int    `json:"容器端口"`
+	Container_id       string `json:"容器ID"`
 	Machine_id         int    `json:"对应机器ID"`
 	Container_status   int    `json:"容器的状态"`
 	User_id            int    `json:"创建容器的用户"`
+}
+
+func (Container) TableName() string {
+	return "container"
 }
 
 func FindContainer(user_id int64) Container {
