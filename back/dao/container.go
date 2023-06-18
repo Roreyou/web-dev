@@ -3,6 +3,7 @@ package dao
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -30,6 +31,9 @@ type Container struct {
 func (Container) TableName() string {
 	return "container"
 }
+func (Used_Record) TableName() string {
+	return "used_record"
+}
 
 func FindContainer(user_id int64) Container {
 	db := Openmysql()
@@ -48,9 +52,11 @@ func FindContainer(user_id int64) Container {
 }
 
 func UseContainer(c *gin.Context) (Container, bool) { //能否使用容器,即密码是否正确
-	keywords := c.PostFormArray("keywords") //获取输入数据
-	userid_string := keywords[0]
-	password := keywords[1]
+	//keywords := c.PostFormArray("keywords") //获取输入数据
+	//userid_string := keywords[0]
+	//password := keywords[1]
+	userid_string := c.PostForm("user_id")
+	password := c.PostForm("container_password")
 	user_id, _ := strconv.ParseInt(userid_string, 10, 64) //要转化成int64类型
 	container := FindContainer(user_id)                   //找到对应容器
 	container_password := container.Container_password    //查找密码
@@ -90,9 +96,10 @@ func CreateRecord(container Container, start_time time.Time) { //创建一条使
 		Rent_time:  rent_time.String(), //获得时间差
 		Used_time:  total_time.String(),
 	}
+	fmt.Println(record)
 	db.Create(&record) //将这个记录增加
 }
-func UpdateRecord(user_id int64, end_time time.Time) { //退出容器后更新使用记录
+func UpdateRecord(user_id int64, end_time time.Time) bool { //退出容器后更新使用记录
 	db := Openmysql()
 	var record Used_Record
 	db.Table("used_record").Where("user_id = ?", user_id).Last(&record) //查找最新的记录,开始时间相同
@@ -100,19 +107,25 @@ func UpdateRecord(user_id int64, end_time time.Time) { //退出容器后更新�
 	// 	panic(err)
 	// } else { //更新记录
 
-	db.Table("used_record").Where("user_id= ? and start_time = ?", user_id, record.Start_time).Update("end_time", end_time.String())
-	db.Table("used_record").Where("user_id= ? and start_time = ?", user_id, record.Start_time).Update("rent_time", end_time.Sub(record.Start_time))
+	db.Table("used_record").Where("user_id= ? and start_time = ?", user_id, record.Start_time).Update("end_time", end_time)
+	db.Table("used_record").Where("user_id= ? and start_time = ?", user_id, record.Start_time).Update("rent_time", (end_time.Sub(record.Start_time)).String())
 	used_time, _ := time.ParseDuration(record.Used_time)
 	rent_time, _ := time.ParseDuration(record.Rent_time)
 	new_rentTime := (used_time - rent_time + end_time.Sub(record.Start_time)).String()
 	db.Table("used_record").Where("user_id= ? and start_time = ?", user_id, record.Start_time).Update("used_time", new_rentTime)
 	//}
+	db.Table("used_record").Where("user_id= ? and start_time = ?", user_id, record.Start_time).First(&record)
+	return IsOutTime(record)
 }
 func UpdateContainerStatus(status int, container Container) { //更新容器的状态
 	db := Openmysql()
-	db.Table("container").Where("container_id = ?", container.Container_id).Update("container_status", container.Container_status)
+	db.Table("container").Where("container_id = ?", container.Container_id).Update("container_status", status)
 }
-
+func IsOutTime(record Used_Record) bool { //容器使用是否超出额度
+	used_hour := strings.Split(record.Used_time, "h")
+	hour, _ := strconv.Atoi(used_hour[0])
+	return hour >= 10
+}
 func IsContainerUsing() bool { //是否有正在使用的容器
 	db := Openmysql()
 	var container Container
