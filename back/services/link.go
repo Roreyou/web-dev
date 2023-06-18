@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"time"
 
 	"golang.org/x/crypto/ssh"
 )
@@ -24,42 +23,6 @@ func IfuserTimeout(uid string) bool { //检查用户是否超额
 	fmt.Print("c:")
 	fmt.Println(c)
 	return h < 10
-}
-
-func Repasswd(psw string) { //修改容器密码
-	sshConfig := &ssh.ClientConfig{
-		User: "root",
-		Auth: []ssh.AuthMethod{
-			ssh.Password("123456"),
-		},
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
-	}
-	// 连接SSH服务器
-	sshClient, err := ssh.Dial("tcp", "172.16.108.78:20000", sshConfig)
-	if err != nil {
-		panic(err)
-	}
-	defer sshClient.Close()
-	fmt.Println("--------容器连接成功-------------")
-	// 创建新的会话
-	session, err := sshClient.NewSession()
-	if err != nil {
-		panic(err)
-	}
-	defer session.Close()
-	// 远程连接docker并修改密码
-	commands := []string{
-		"echo root:" + psw + " | chpasswd",
-		"exit",
-	}
-	command := strings.Join(commands, "; ")
-
-	if err := session.Run(command); err != nil {
-		panic("Failed to login to swarm registry: " + err.Error())
-	}
-	fmt.Println("------------密码修改----------成功")
-	session.Close()
-
 }
 
 func StorecontainerInfo(imd int, psw string, cid string, mid int) {
@@ -111,51 +74,25 @@ func GreateDocker(mid string, uid string, did string, pwd string) int {
 	commands := []string{
 		cmd,
 		"docker start tensorflow" + tid,
-		//"docker ps",
+		"docker exec tensorflow" + tid + " bash -c " + `"` + "echo root:" + pwd + "|chpasswd" + `"`, //修改密码
+		"docker stop tensorflow" + tid,
 	}
 	command := strings.Join(commands, "; ")
 	fmt.Println(cmd)
 	output, err := session.CombinedOutput(command)
 	if err != nil {
-		panic(err)
+		fmt.Println("创建容器失败", err)
+		return 2
 	}
-	fmt.Println("------------容器创建----------成功")
 	cid := string(output)
 	cid = cid[0:12]
 	fmt.Println(cid)
+	if cid == "Error respon" {
+		return 2
+	}
 	session.Close()
-	time.Sleep(1.5 * 1000 * time.Millisecond)
-	Repasswd(pwd)
+	fmt.Println("------------容器创建----------成功")
 	sid, _ := strconv.Atoi(mid)
 	StorecontainerInfo(1, pwd, cid, sid)
-	Tail(tid)
 	return 0
-}
-
-func Tail(tid string) {
-	sshConfig := &ssh.ClientConfig{
-		User: "zhangn279",
-		Auth: []ssh.AuthMethod{
-			ssh.Password("ssezhangneng@972"),
-		},
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
-	}
-
-	// 连接SSH服务器
-	sshClient, err := ssh.Dial("tcp", "ssh.schoolresearch.one:21006", sshConfig)
-	if err != nil {
-		panic(err)
-	}
-	defer sshClient.Close()
-	fmt.Println("--------连接成功-------------")
-	// 创建新的会话
-	session, err := sshClient.NewSession()
-	if err != nil {
-		panic(err)
-	}
-	defer session.Close()
-	if err := session.Run("docker stop tensorflow" + tid); err != nil {
-		panic(err)
-	}
-	defer sshClient.Close()
 }

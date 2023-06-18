@@ -66,6 +66,7 @@ func ConnectContainer(c *gin.Context) {
 			start_time := time.Now()                //获取现在的时间
 			dao.CreateRecord(container, start_time) //创建使用记录
 			dao.UpdateContainerStatus(3, container) //容器正在使用
+			dao.ChangserverFlag(true)
 			c.JSON(http.StatusOK, gin.H{
 				"msg": "容器正在使用中",
 			})
@@ -114,6 +115,7 @@ func ExitContainer(c *gin.Context) { //关机
 	fmt.Println(string(output))
 	end_time := time.Now()
 	outtime := dao.UpdateRecord(user_id, end_time)
+	dao.ChangserverFlag(false)
 	dao.UpdateContainerStatus(2, container)
 	if outtime { //超时
 		//删除容器禁止下次使用
@@ -148,6 +150,7 @@ func ExitContainer(c *gin.Context) { //关机
 		}
 		fmt.Println(string(output))
 		dao.UpdateContainerStatus(1, container) //将容器的状态表示已删除
+		dao.ChangserverFlag(false)
 		c.JSON(http.StatusOK, gin.H{
 			"msg":     "容器已停止使用",
 			"warning": "容器使用超出额度",

@@ -24,5 +24,6 @@ func GetGpuInfo(c *gin.Context) *[]Server_Info {
 	var u2 []Server_Info
 	//db.Find(&u2)
 	db.Where("server_flag = ?", "false").Find(&u2) //查询数据
-	return &u2                                     //返回数据
+	ChangserverFlag(false)
+	return &u2 //返回数据
 }

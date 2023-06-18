@@ -139,3 +139,9 @@ func IsContainerUsing() bool { //是否有正在使用的容器
 		return true
 	}
 }
+
+func ChangserverFlag(flag bool) {
+	db := Openmysql()
+	fmt.Println("在改了在改了")
+	db.Table("server_info").Update("server_flag", flag)
+}
