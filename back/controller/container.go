@@ -19,21 +19,18 @@ import (
 // 3表示容器正在使用
 func ConnectContainer(c *gin.Context) {
 	container, is_enter := dao.UseContainer(c) //密码输入是否正确
-
-	if !is_enter { //判断是否能进入
+	if !is_enter {                             //判断是否能进入
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"msg": "密码不正确",
 		})
 	} else {
-		if container.Container_status == 0 { //容器未被创建
-			//创建容器
-		} else if container.Container_status == 1 { //容器被删除
+		if container.Container_status == 1 { //容器被删除
 			c.JSON(http.StatusBadRequest, gin.H{
 				"msg": "时间已超额",
 			})
-		} else if container.Container_status == 2 { //容器正在使用
-			c.JSON(http.StatusBadRequest, gin.H{
-				"msg": "时间已超额",
+		} else if flag := dao.IsContainerUsing(); flag == true { //容器正在使用
+			c.JSON(http.StatusUnprocessableEntity, gin.H{
+				"warining": "容器正在使用",
 			})
 		} else { //容器存在
 			//ssh连接信息
@@ -45,12 +42,13 @@ func ConnectContainer(c *gin.Context) {
 				HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 			}
 			//连接ssh服务器
-			client, err := ssh.Dial("tcp", "ssh.schoolresearch.one:21110", config)
+			client, err := ssh.Dial("tcp", "172.16.108.78:2022", config)
 			if err != nil {
 				log.Fatal("Failed to dial: ", err)
 			}
 			defer client.Close()
-			str := strconv.Itoa(container.Image_ID) //将整数转为字符串
+			//str := strconv.Itoa(container.Image_ID) //将整数转为字符串
+			str := container.Container_id
 			//cmd := "docker attach " + str           //回到已经退出的但是仍然在运行的容器的命令
 			cmd := "docker start " + str //启动容器
 			// 创建新的会话
@@ -68,29 +66,39 @@ func ConnectContainer(c *gin.Context) {
 			start_time := time.Now()                //获取现在的时间
 			dao.CreateRecord(container, start_time) //创建使用记录
 			dao.UpdateContainerStatus(3, container) //容器正在使用
+			c.JSON(http.StatusOK, gin.H{
+				"msg": "容器正在使用中",
+			})
 		}
 	}
 }
-func ExitContainer(c *gin.Context) { //
+func ExitContainer(c *gin.Context) { //关机
 	keywords := c.PostFormArray("keywords") //获取输入数据
 	userid_string := keywords[0]
 	user_id, _ := strconv.ParseInt(userid_string, 10, 64) //要转化成int64类型
 	container := dao.FindContainer(user_id)               //找到对应容器
+	if container.Container_status == 1 {                  //容器被删除
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "时间已超额",
+		})
+		return
+	}
 	config := &ssh.ClientConfig{
-		User: "your_username",
+		User: "zhangn279", //服务器的账号
 		Auth: []ssh.AuthMethod{
-			ssh.Password("your_password"),
+			ssh.Password("ssezhangneng@972"), //服务器密码
 		},
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
 	//连接ssh服务器
-	client, err := ssh.Dial("tcp", "your_server_address:22", config)
+	client, err := ssh.Dial("tcp", "172.16.108.78:2022", config)
 	if err != nil {
 		log.Fatal("Failed to dial: ", err)
 	}
 	defer client.Close()
-	str := strconv.Itoa(container.Image_ID) //将整数转为字符串
-	cmd := "docker stop " + str             //关闭容器的命令
+	//str := strconv.Itoa(container.Image_ID) //将整数转为字符串
+	str := container.Container_id
+	cmd := "docker stop " + str //关闭容器的命令
 	//创建新的会话
 	session, err := client.NewSession()
 	if err != nil {
@@ -105,6 +113,10 @@ func ExitContainer(c *gin.Context) { //
 	fmt.Println(string(output))
 	end_time := time.Now()
 	dao.UpdateRecord(user_id, end_time)
+	dao.UpdateContainerStatus(2, container)
+	c.JSON(http.StatusOK, gin.H{
+		"msg": "容器已停止使用",
+	})
 }
 func DeleteContainer(c *gin.Context) { //删除服务器
 	container, is_enter := dao.UseContainer(c)
@@ -115,21 +127,22 @@ func DeleteContainer(c *gin.Context) { //删除服务器
 	} else {
 		//ssh连接信息
 		config := &ssh.ClientConfig{
-			User: "your_username",
+			User: "zhangn279", //服务器的账号
 			Auth: []ssh.AuthMethod{
-				ssh.Password("your_password"),
+				ssh.Password("ssezhangneng@972"), //服务器密码
 			},
 			HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 		}
 		//连接ssh服务器
-		client, err := ssh.Dial("tcp", "your_server_address:22", config)
+		client, err := ssh.Dial("tcp", "172.16.108.78:2022", config)
 		if err != nil {
 			log.Fatal("Failed to dial: ", err)
 		}
 		defer client.Close()
 		//cmd := "exit" //退出容器的命令
-		str := strconv.Itoa(container.Image_ID) //将整数转为字符串
-		cmd := "docker rm " + str               //删除容器
+		//str := strconv.Itoa(container.Image_ID) //将整数转为字符串
+		str := container.Container_id
+		cmd := "docker rm " + str //删除容器
 		//创建新的会话
 		session, err := client.NewSession()
 		if err != nil {
@@ -143,5 +156,8 @@ func DeleteContainer(c *gin.Context) { //删除服务器
 		}
 		fmt.Println(string(output))
 		dao.UpdateContainerStatus(1, container) //将容器的状态表示已删除
+		c.JSON(http.StatusOK, gin.H{
+			"msg": "容器已删除",
+		})
 	}
 }
