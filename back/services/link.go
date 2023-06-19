@@ -25,8 +25,9 @@ func IfuserTimeout(uid string) bool { //检查用户是否超额
 	return h < 10
 }
 
-func StorecontainerInfo(imd int, psw string, cid string, mid int) {
+func StorecontainerInfo(imd int, psw string, cid string, mid int, uid int) {
 	db := dao.Openmysql()
+
 	c := dao.Container{
 		Image_ID:           imd,
 		Container_password: psw,
@@ -34,7 +35,8 @@ func StorecontainerInfo(imd int, psw string, cid string, mid int) {
 		Container_id:       cid,
 		Machine_id:         mid,
 		Container_status:   2,
-		User_id:            1,
+		User_id:            uid,
+		Container_ip:       "172.16.108.78",
 	}
 	if err := db.Create(&c).Error; err != nil {
 		fmt.Println("插入失败", err)
@@ -93,6 +95,7 @@ func GreateDocker(mid string, uid string, did string, pwd string) int {
 	session.Close()
 	fmt.Println("------------容器创建----------成功")
 	sid, _ := strconv.Atoi(mid)
-	StorecontainerInfo(1, pwd, cid, sid)
+	iuid, _ := strconv.Atoi(uid)
+	StorecontainerInfo(1, pwd, cid, sid, iuid)
 	return 0
 }
