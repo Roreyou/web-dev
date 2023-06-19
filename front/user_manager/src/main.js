@@ -11,6 +11,28 @@ Vue.config.productionTip = false
 Vue.prototype.$axios = axios
 Vue.use(ElementUI)
 
+router.beforeEach((to,from,next)=>{
+  const if_token=sessionStorage.getItem("token")
+  if(!if_token&&to.name!=='Login')
+  {
+    next({name:'Login'})
+  }
+  else if(if_token&&to.name==='Login'){
+    next('/manage')//用户已登录时，使其不再访问登录页面
+  }
+  else if(if_token!=='1'&&(to.name==='Contmanage'||to.name==='GPUmanage'||to.name==='Usermanage'))
+  {
+    next('/manage')
+  }
+  else if(if_token==='1'&&(to.name!=='Contmanage'&&to.name!=='GPUmanage'&&to.name!=='Usermanage'))
+  {
+    next('/gpumanage')
+  }
+  else{
+    next();
+  }
+})
+
 //axios.defaults.baseURL = '/api'        //关键代码
 Vue.config.productionTip = false
 
