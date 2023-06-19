@@ -126,7 +126,7 @@ export default {
         // 调用接口，获取使用记录
         $.ajax({
             type: 'POST',
-            url: 'http://127.0.0.1:8080/admin/show_user',
+            url: 'http://127.0.0.1:8081/admin/show_user',
             data: {},
             success: (response) => {
             // 请求成功的处理逻辑
@@ -201,7 +201,7 @@ export default {
             console.log(row)
             $.ajax({
             type: 'POST',
-            url: 'http://127.0.0.1:8080/admin/init_password',
+            url: 'http://127.0.0.1:8081/admin/init_password',
             data: {
                 user_id: row.account
             },

@@ -84,7 +84,7 @@ export default {
        else{
         $.ajax({
         type: "POST",
-        url: "http://127.0.0.1:8080/user",
+        url: "http://127.0.0.1:8081/user",
         data: {
             user_id: this.form.user_id,
             user_password: this.form.user_password,
