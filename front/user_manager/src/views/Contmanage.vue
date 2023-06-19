@@ -36,7 +36,7 @@
                                     </template>
                                 </el-form-item>
 
-                                <!-- <el-form-item label="使用时间" prop="Usetime">
+                                <el-form-item label="使用时间" prop="Usetime">
                                     <el-tag :key="tag" v-model="form.Usetime" v-for="tag in form.Usetime" closable
                                         :disable-transitions="false" @close="tagClose(tag)">
                                         {{ tag }}
@@ -48,7 +48,7 @@
                                     <el-button v-else class="button-new-tag" size="small" @click="tagInput">+ New
                                         Tag</el-button>
 
-                                </el-form-item> -->
+                                </el-form-item>
                             </el-form>
 
                             <span slot="footer" class="dialog-footer">
@@ -87,11 +87,11 @@
                             <el-table-column prop="Status" label="容器状态" width="200">
                             </el-table-column>
 
-                            <!-- <el-table-column label="容器使用时间" width="550">
+                            <el-table-column label="容器使用时间" width="550">
                                 <template slot-scope="scope">
                                     <div v-for="item in scope.row.Usetime" :key="item">{{ item }}</div>
                                 </template>
-                            </el-table-column> -->
+                            </el-table-column>
 
                             <el-table-column label="操作">
                                 <template slot-scope="scope">
@@ -125,7 +125,7 @@ export default {
                 IP: '',
                 Port: '',
                 Status: '',
-                //Usetime: []
+                Usetime: []
             },
             rules: {
                 ID: [
@@ -140,9 +140,9 @@ export default {
                 Status: [
                     { required: true, message: '请输入容器状态' }
                 ],
-                // Usetime: [
-                //     { required: true, message: '请输入容器使用时间' }
-                // ]
+                Usetime: [
+                    { required: true, message: '请输入容器使用时间' }
+                ]
             },
             options: [{ value: '创建' }, { value: '正在使用' }, { value: '删除' }],
             TableDataa: [{
@@ -150,25 +150,25 @@ export default {
                 IP: '192.168.0.1',
                 Port: '3306',
                 Status: '创建',
-                //Usetime: []
+                Usetime: []
             }, {
                 ID: '45',
                 IP: '192.168.0.3',
                 Port: '3355',
                 Status: '正在使用',
-                //Usetime: ['2022.12.15-2022.12.19', '2023.4.5-2023.4.8']
+                Usetime: ['2022.12.15-2022.12.19', '2023.4.5-2023.4.8']
             }, {
                 ID: '66',
                 IP: '192.168.3.2',
                 Port: '3746',
                 Status: '删除',
-                //Usetime: ['2022.12.25-2022.12.26']
+                Usetime: ['2022.12.25-2022.12.26']
             }, {
                 ID: '88',
                 IP: '192.168.4.5',
                 Port: '3852',
                 Status: '正在使用',
-                //Usetime: ['2022.12.6-2022.12.9', '2023.2.5-2023.2.9']
+                Usetime: ['2022.12.6-2022.12.9', '2023.2.5-2023.2.9']
             }]
         }
     },
@@ -185,7 +185,7 @@ export default {
                     IP: '',
                     Port: '',
                     Status: '',
-                    //Usetime: []
+                    Usetime: []
                 }
                 this.$refs.form.resetFields()
             })
@@ -222,25 +222,25 @@ export default {
             this.form = JSON.parse(JSON.stringify(row))
         },
 
-        // tagClose(tag) {
-        //     this.form.Usetime.splice(this.form.Usetime.indexOf(tag), 1);
-        // },
+        tagClose(tag) {
+            this.form.Usetime.splice(this.form.Usetime.indexOf(tag), 1);
+        },
 
-        // tagInput() {
-        //     this.inputVisible = true;
-        //     this.$nextTick(_ => {
-        //         this.$refs.saveTagInput.$refs.input.focus();
-        //     });
-        // },
+        tagInput() {
+            this.inputVisible = true;
+            this.$nextTick(_ => {
+                this.$refs.saveTagInput.$refs.input.focus();
+            });
+        },
 
-        // tagInputConfirm() {
-        //     let inputValue = this.inputValue;
-        //     if (inputValue) {
-        //         this.form.Usetime.push(inputValue);
-        //     }
-        //     this.inputVisible = false;
-        //     this.inputValue = '';
-        // }
+        tagInputConfirm() {
+            let inputValue = this.inputValue;
+            if (inputValue) {
+                this.form.Usetime.push(inputValue);
+            }
+            this.inputVisible = false;
+            this.inputValue = '';
+        }
     }
 }
 </script>
@@ -249,21 +249,21 @@ export default {
 .el-header {
     padding: 0px;
 }
-// .el-tag+.el-tag {
-//     margin-left: 10px;
-// }
+.el-tag+.el-tag {
+    margin-left: 10px;
+}
 
-// .button-new-tag {
-//     margin-left: 10px;
-//     height: 32px;
-//     line-height: 30px;
-//     padding-top: 0;
-//     padding-bottom: 0;
-// }
+.button-new-tag {
+    margin-left: 10px;
+    height: 32px;
+    line-height: 30px;
+    padding-top: 0;
+    padding-bottom: 0;
+}
 
-// .input-new-tag {
-//     width: 90px;
-//     margin-left: 10px;
-//     vertical-align: bottom;
-// }
+.input-new-tag {
+    width: 90px;
+    margin-left: 10px;
+    vertical-align: bottom;
+}
 </style>
