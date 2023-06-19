@@ -86,3 +86,10 @@ func Show_alluser(c *gin.Context) []User_Info {
 	fmt.Println(saveInfo)
 	return saveInfo
 }
+
+func FindAllCont() (cont []Container) {
+	db := Openmysql()
+	db.Model(&Container{})
+	db.Table("container").Find(&cont)
+	return cont
+}

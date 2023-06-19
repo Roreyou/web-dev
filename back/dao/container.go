@@ -23,7 +23,6 @@ type Container struct {
 	Image_ID           int    `json:"镜像ID" db:"image_id"`
 	Container_port     int    `json:"容器端口" db:"container_port"`
 	Container_status   int    `json:"容器的状态" db:"container_status"`
-	Container_ip       string `json:"容器所在IP" db:"container_ip"`
 	Container_password string `json:"容器密码" db:"container_password"`
 	Container_id       string `json:"容器ID" db:"container_id"`
 	Machine_id         int    `json:"对应机器ID" db:"machine_id"`
@@ -162,5 +161,6 @@ func IsContainerUsing() bool { //是否有正在使用的容器
 
 func ChangserverFlag(flag bool) {
 	db := Openmysql()
+	fmt.Println("在改了在改了")
 	db.Table("server_info").Update("server_flag", flag)
 }

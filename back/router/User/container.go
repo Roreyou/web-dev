@@ -7,17 +7,18 @@ import (
 )
 
 func EnterContainerRoute(r *gin.Engine) { //开机
-	//UserRouter := r.Group("/user")
-	r.POST("/work", controller.ConnectContainer)
+	UserRouter := r.Group("/user")
+	UserRouter.POST("/work", controller.ConnectContainer)
 }
 
 func ExitContainerRoute(r *gin.Engine) { //删除服务器
-	//UserRouter := r.Group("/user")
-	r.POST("/exit", controller.ExitContainer)
+	UserRouter := r.Group("/user")
+	UserRouter.POST("/exit", controller.ExitContainer)
 }
 
 func DeleteContainerRoute(r *gin.Engine) { //关机
-	r.POST("/close", controller.DeleteContainer)
+	UserRouter := r.Group("/user")
+	UserRouter.POST("/close", controller.DeleteContainer)
 }
 
 func ContainerInfo(r *gin.Engine) { //展示容器信息
