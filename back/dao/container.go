@@ -25,6 +25,7 @@ type Container struct {
 	Container_status   int    `json:"容器的状态" db:"container_status"`
 	Container_password string `json:"容器密码" db:"container_password"`
 	Container_id       string `json:"容器ID" db:"container_id"`
+	Container_ip       string `json:"容器所在ip" db:"container_ip"`
 	Machine_id         int    `json:"对应机器ID" db:"machine_id"`
 }
 

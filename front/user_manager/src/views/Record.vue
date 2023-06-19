@@ -65,7 +65,7 @@ export default {
           // 请求成功的处理逻辑
           console.log(response);
           // 渲染数据到 el-table
-          this.renderTable(response.tableData);
+          this.renderTable(response);
         },
         error: (xhr, status, error) => {
           // 请求失败的处理逻辑
