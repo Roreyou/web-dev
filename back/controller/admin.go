@@ -106,3 +106,16 @@ func Show_alluserContrller(c *gin.Context) {
 	*/
 	c.JSON(http.StatusOK, dao.Show_alluser(c))
 }
+
+func FindAllContController(c *gin.Context) {
+	/*
+		//用token的测试版本
+		_, err := middlewares.GetToken(c) //获取token
+		if err != nil {
+			//c.AbortWithError(500, err)
+			c.HTML(http.StatusForbidden, "no_right.html", nil)
+		} else {
+			c.JSON(http.StatusOK, dao.FindAllCont())
+		}*/
+	c.JSON(http.StatusOK, dao.FindAllCont())
+}

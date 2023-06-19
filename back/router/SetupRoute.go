@@ -22,6 +22,7 @@ func SetupRouter() *gin.Engine {
 	Admin.Add_usrRoute(r)
 	Admin.Delete_usrRoute(r)
 	Admin.Show_usrRoute(r)
+	Admin.Show_contRoute(r)
 	User.EnterContainerRoute(r)
 	User.DeleteContainerRoute(r)
 	User.ExitContainerRoute(r)
