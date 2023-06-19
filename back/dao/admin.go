@@ -27,7 +27,7 @@ func Add_user(c *gin.Context) bool {
 	hashedPassword_hdm := sha256.Sum256([]byte(userpassword))
 	save_Password := hex.EncodeToString(hashedPassword_hdm[:])
 
-	u1 := User_Info{user_id, user_name, real_name, save_Password}
+	u1 := User_Info{user_id, user_name, real_name, save_Password, "10h"}
 	// 创建记录
 	db.Table("user_info").Create(&u1)
 	fmt.Println(u1)

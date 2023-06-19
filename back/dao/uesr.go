@@ -16,6 +16,7 @@ type User_Info struct {
 	User_Name     string `json:"user_name" db:"user_name"`
 	Real_name     string `json:"real_name" db:"real_name"`
 	User_password string `json:"user_password" db:"user_password"`
+	Remainder     string `json:"remainder" db:"remainder"`
 }
 
 type Admin_Info struct {

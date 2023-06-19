@@ -25,9 +25,9 @@ func Show(c *gin.Context) {
 func Link(c *gin.Context) {
 	user_id := c.PostForm("user_id")
 	machineid := c.PostForm("server_id")
-	docker_id := c.PostForm("docker_id")
+	image_id := c.PostForm("image_id")
 	user_password := c.PostForm("user_password")
-	result := services.GreateDocker(machineid, user_id, docker_id, user_password)
+	result := services.GreateDocker(machineid, user_id, image_id, user_password)
 	if result == 0 {
 		c.JSON(http.StatusOK, gin.H{
 			"Success": "容器创建成功",
