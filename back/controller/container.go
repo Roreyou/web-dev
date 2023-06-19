@@ -204,3 +204,24 @@ func DeleteContainer(c *gin.Context) { //删除服务器
 		})
 	}
 }
+
+func ShowContainerInfo(c *gin.Context) {
+	userid_string := c.PostForm("user_id")
+	user_id, _ := strconv.ParseInt(userid_string, 10, 64)    //要转化成int64类型
+	containerInfo := dao.FindContainer(user_id)              //找到对应容器
+	machineInfo := dao.FindMachine(containerInfo.Machine_id) //找到对应服务器
+	//" ssh root@172.16.108.78 -p 20000"
+	port_string := strconv.Itoa(containerInfo.Container_port)
+	ssh := "ssh root@" + containerInfo.Container_ip + " -p " + port_string
+	if (containerInfo == dao.Container{}) {
+		c.JSON(http.StatusOK, gin.H{
+			"msg": "用户不存在",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"machine_id":  machineInfo.Server_id,
+		"server_type": machineInfo.Server_type,
+		"SSH":         ssh,
+	})
+}

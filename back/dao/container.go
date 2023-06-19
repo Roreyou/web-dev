@@ -67,6 +67,25 @@ func UseContainer(c *gin.Context) (Container, bool) { //能否使用容器,即�
 		return container, true
 	}
 }
+
+// func FindAllContainer(user_id int64) (containers []Container) { //查找该用户的所有使用容器
+//
+//		db := Openmysql()
+//		defer db.Close() //把数据库的连接关闭掉
+//		//2、把模型与数据库中的表对应起来
+//		db.AutoMigrate(&Container{})
+//		var container []Container
+//		db.Table("container").Where("user_id = ?", user_id).Take(container)
+//		return container
+//	}
+func FindMachine(machine_id int) (server Server_Info) { //返回服务器信息
+	db := Openmysql()
+	defer db.Close() //把数据库的连接关闭掉
+	//2、把模型与数据库中的表对应起来
+	db.AutoMigrate(&Used_Record{})
+	db.Table("server_info").Where("server_id = ?", machine_id).Take(&server)
+	return server
+}
 func CreateRecord(container Container, start_time time.Time) { //创建一条使用记录进入数据库
 	db := Openmysql()
 	defer db.Close() //把数据库的连接关闭掉

@@ -19,3 +19,7 @@ func ExitContainerRoute(r *gin.Engine) { //删除服务器
 func DeleteContainerRoute(r *gin.Engine) { //关机
 	r.POST("/close", controller.DeleteContainer)
 }
+
+func ContainerInfo(r *gin.Engine) { //展示容器信息
+	r.POST("/show", controller.ShowContainerInfo)
+}

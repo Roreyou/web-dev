@@ -25,5 +25,6 @@ func SetupRouter() *gin.Engine {
 	User.EnterContainerRoute(r)
 	User.DeleteContainerRoute(r)
 	User.ExitContainerRoute(r)
+	User.ContainerInfo(r)
 	return r
 }
