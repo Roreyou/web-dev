@@ -13,16 +13,15 @@ var c int
 
 func IfuserTimeout(uid string) bool { //检查用户是否超额
 	db := dao.Openmysql()
-	var ur dao.Used_Record
-	db.Table("used_record").Where("user_id = ?", uid).First(&ur)
-	ut := ur.Used_time
+	var ur dao.User_Info
+	db.Table("user_info").Where("user_id = ?", uid).First(&ur)
+	ut := ur.Remainder
 	uh := strings.Split(ut, "h")
 	h, _ := strconv.Atoi(uh[0])
-	fmt.Println(h)
-	db.Table("container").Count(&c)
-	fmt.Print("c:")
-	fmt.Println(c)
-	return h < 10
+	um := strings.Split(uh[1], "m")
+	m, _ := strconv.Atoi(um[0])
+	db.Table("container").Where("user_id = ? ", uid).Count(&c)
+	return h == 0 && m < 5 //小于五分钟就超额了
 }
 
 func StorecontainerInfo(imd int, psw string, cid string, mid int, uid int) {
@@ -45,8 +44,12 @@ func StorecontainerInfo(imd int, psw string, cid string, mid int, uid int) {
 }
 
 func GreateDocker(mid string, uid string, did string, pwd string) int {
-	if !IfuserTimeout(uid) {
+	if IfuserTimeout(uid) {
 		return 1
+	}
+
+	if c > 0 {
+		return 3
 	}
 	sshConfig := &ssh.ClientConfig{
 		User: "zhangn279",
@@ -71,13 +74,19 @@ func GreateDocker(mid string, uid string, did string, pwd string) int {
 	defer session.Close()
 
 	// 在远程服务器上运行Docker命令来创建一个新的容器
-	tid := fmt.Sprintf("%d", c)
-	cmd := "docker create --gpus " + `"` + "device=" + mid + `"` + " -it -p 20000:22 --name tensorflow" + tid + " 7e84df504bd9 bash"
+	var iid string
+	if did == "1" {
+		iid = "7e84df504bd9"
+	} else if did == "2" {
+		iid = "czq/tf2.8:v1.1"
+	}
+
+	cmd := "docker create --gpus " + `"` + "device=" + mid + `"` + " -it -p 20000:22 --name tensorflow" + uid + " " + iid + " bash"
 	commands := []string{
 		cmd,
-		"docker start tensorflow" + tid,
-		"docker exec tensorflow" + tid + " bash -c " + `"` + "echo root:" + pwd + "|chpasswd" + `"`, //修改密码
-		"docker stop tensorflow" + tid,
+		"docker start tensorflow" + uid,
+		"docker exec tensorflow" + uid + " bash -c " + `"` + "echo root:" + pwd + "|chpasswd" + `"`, //修改密码
+		"docker stop tensorflow" + uid,
 	}
 	command := strings.Join(commands, "; ")
 	fmt.Println(cmd)

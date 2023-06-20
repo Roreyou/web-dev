@@ -35,12 +35,17 @@ func Link(c *gin.Context) {
 	}
 	if result == 1 {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"msg": "时间已超额",
+			"msg": "可用时间不足！",
 		})
 	}
 	if result == 2 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"fail": "容器创建失败",
+		})
+	}
+	if result == 3 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "已有容器存在，不能创建超过一个容器",
 		})
 	}
 }
