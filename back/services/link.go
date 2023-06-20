@@ -20,7 +20,7 @@ func IfuserTimeout(uid string) bool { //检查用户是否超额
 	h, _ := strconv.Atoi(uh[0])
 	um := strings.Split(uh[1], "m")
 	m, _ := strconv.Atoi(um[0])
-	db.Table("container").Where("user_id = ? ", uid).Count(&c)
+	db.Table("container").Where("user_id = ? and container_status=2", uid).Count(&c)
 	return h == 0 && m < 5 //小于五分钟就超额了
 }
 
@@ -75,17 +75,20 @@ func GreateDocker(mid string, uid string, did string, pwd string) int {
 
 	// 在远程服务器上运行Docker命令来创建一个新的容器
 	var iid string
+	var dun string
 	if did == "1" {
 		iid = "7e84df504bd9"
+		dun = "root"
 	} else if did == "2" {
-		iid = "czq/tf2.8:v1.1"
+		iid = "czq/tf2.8:v1.0"
+		dun = "mist"
 	}
 
 	cmd := "docker create --gpus " + `"` + "device=" + mid + `"` + " -it -p 20000:22 --name tensorflow" + uid + " " + iid + " bash"
 	commands := []string{
 		cmd,
 		"docker start tensorflow" + uid,
-		"docker exec tensorflow" + uid + " bash -c " + `"` + "echo root:" + pwd + "|chpasswd" + `"`, //修改密码
+		"docker exec tensorflow" + uid + " bash -c " + `"` + "echo " + dun + ":" + pwd + "|chpasswd" + `"`, //修改密码
 		"docker stop tensorflow" + uid,
 	}
 	command := strings.Join(commands, "; ")
