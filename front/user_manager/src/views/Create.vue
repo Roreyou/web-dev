@@ -12,10 +12,9 @@
             <el-radio
               v-model="selectedGPUIndex"
               :label="item.index"
-              :disabled="value !== '' && item.index !== value"
               border
             >
-              备选项1
+              选择
             </el-radio>
           </div>
         </el-card>
@@ -43,12 +42,13 @@
           <el-checkbox v-model="checked">我已阅读并同意使用须知</el-checkbox>
         </div>
 
-        <el-button type="warning" round>创建</el-button>
+        <el-button type="warning" @click="createGPU" round>创建</el-button>
       </el-card>
     </div>
   </template>
   
   <script>
+    import $ from 'jquery'
   export default {
     data() {
       return {
@@ -56,27 +56,86 @@
         input: '',
         value: '',
         selectedGPUIndex: '',
-        GPUData: [
-          {
-            index: '1',
-            name: 'RTX3090',
-            size: '24G',
-            frame_list: ['TensorFlow 2.8.0+ PyTorch 1.11.0+ conda/mamba + opencv 4+ CUDA11.6/cudnn8.4.0+ Python3.9.12'],
-          },
-          {
-            index: '2',
-            name: 'PG500-216(V100-32GB)',
-            size: '32G',
-            frame_list: ['TensorFlow 2.8.0 + PyTorch 1.11.0 + conda/mamba + opency 4 + CUDA11.6/cudnn8.4.0 + Python3.9.12', 'TensorFlow 1.15.5 + PyTorch 1.11.0 + conda/mamba + opencv 4 + CUDA11.6/cudnn8.4.0 + Python3.8'],
-          },
-        ],
+        GPUData: [],
+        selectedGPUFrameList:['tensorflow2.1.0+pythorch1.11+python3.6.9','tensorflow2.6.0+pythorch1.11+python3.9.0'],
       };
     },
-    computed: {
-      selectedGPUFrameList() {
-        const selectedGPU = this.GPUData.find(item => item.index === this.selectedGPUIndex);
-        return selectedGPU ? selectedGPU.frame_list : [];
+    mounted() {
+    // 在进入页面后立即调用的操作
+    this.getAccessGPUData();
+    },
+    methods:{
+      getAccessGPUData() {
+        // 调用接口，获取使用记录
+        $.ajax({
+            type: 'GET',
+            url: 'http://127.0.0.1:8081/user/get_item',
+            success: (response) => {
+            // 请求成功的处理逻辑
+            console.log(response);
+            // 渲染数据到 el-table
+            this.renderTable(response);
+            },
+            error: (xhr, status, error) => {
+            // 请求失败的处理逻辑
+            console.log('Error:');
+            },
+        });
       },
+      renderTable(data) {
+        // 将返回的数据格式转换为 el-table 所需的格式
+        this.GPUData = data.map((item) => ({
+            'index': item['server_id'],
+            'name': item['sever_type'],
+            'size': item['server_size'],
+        }));
+      },
+      createGPU(){
+        if(this.input!==''&&this.value!==''&&this.selectedGPUIndex!==''&&this.checked===true){
+          console.log("byebye!")
+          var new_value="0"
+          if(this.value==='tensorflow2.1.0+pythorch1.11+python3.6.9'){
+            new_value="1"
+          }
+          else{
+            new_value="2"
+          }
+          console.log("user_id="+sessionStorage.getItem('user_id'))
+          console.log("server_id="+this.selectedGPUIndex)
+          console.log("image_id="+new_value)
+          console.log("user_password="+this.input)
+          $.ajax({
+                type: 'POST',
+                url: 'http://127.0.0.1:8081/user/create_gpu',
+                data: {
+                     // 请求的参数
+                    user_id: sessionStorage.getItem('user_id'),
+                    server_id:this.selectedGPUIndex,
+                    image_id:new_value,
+                    user_password:this.input,
+                },
+                success: (response) => {
+                // 请求成功的处理逻辑
+                console.log(response);
+                alert("恭喜您创建GPU成功！")
+                },
+                error: (xhr, status, error) => {
+                // 请求失败的处理逻辑
+                console.log('Error:', error);
+                alert("创建GPU失败！")
+                },
+           });
+        }
+        else{
+          alert("请完善相关数据！")
+        }
+      }
+    },
+    computed: {
+      // selectedGPUFrameList() {
+      //   const selectedGPU = this.GPUData.find(item => item.index === this.selectedGPUIndex);
+      //   return selectedGPU ? selectedGPU.frame_list : [];
+      // },
     },
   };
   </script>

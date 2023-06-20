@@ -56,7 +56,7 @@ export default {
       // 调用接口，获取使用记录
       $.ajax({
         type: 'POST',
-        url: 'http://127.0.0.1:8080/user/recording',
+        url: 'http://127.0.0.1:8081/user/recording',
         data: {
           // 请求的参数
           id: sessionStorage.getItem('user_id'),
@@ -65,7 +65,7 @@ export default {
           // 请求成功的处理逻辑
           console.log(response);
           // 渲染数据到 el-table
-          this.renderTable(response.tableData);
+          this.renderTable(response);
         },
         error: (xhr, status, error) => {
           // 请求失败的处理逻辑

@@ -23,9 +23,9 @@ type Container struct {
 	Image_ID           int    `json:"镜像ID" db:"image_id"`
 	Container_port     int    `json:"容器端口" db:"container_port"`
 	Container_status   int    `json:"容器的状态" db:"container_status"`
-	Container_ip       string `json:"容器所在IP" db:"container_ip"`
 	Container_password string `json:"容器密码" db:"container_password"`
 	Container_id       string `json:"容器ID" db:"container_id"`
+	Container_ip       string `json:"容器所在ip" db:"container_ip"`
 	Machine_id         int    `json:"对应机器ID" db:"machine_id"`
 }
 
@@ -66,6 +66,25 @@ func UseContainer(c *gin.Context) (Container, bool) { //能否使用容器,即�
 	} else {
 		return container, true
 	}
+}
+
+// func FindAllContainer(user_id int64) (containers []Container) { //查找该用户的所有使用容器
+//
+//		db := Openmysql()
+//		defer db.Close() //把数据库的连接关闭掉
+//		//2、把模型与数据库中的表对应起来
+//		db.AutoMigrate(&Container{})
+//		var container []Container
+//		db.Table("container").Where("user_id = ?", user_id).Take(container)
+//		return container
+//	}
+func FindMachine(machine_id int) (server Server_Info) { //返回服务器信息
+	db := Openmysql()
+	defer db.Close() //把数据库的连接关闭掉
+	//2、把模型与数据库中的表对应起来
+	db.AutoMigrate(&Used_Record{})
+	db.Table("server_info").Where("server_id = ?", machine_id).Take(&server)
+	return server
 }
 func CreateRecord(container Container, start_time time.Time) { //创建一条使用记录进入数据库
 	db := Openmysql()
@@ -143,5 +162,6 @@ func IsContainerUsing() bool { //是否有正在使用的容器
 
 func ChangserverFlag(flag bool) {
 	db := Openmysql()
+	fmt.Println("在改了在改了")
 	db.Table("server_info").Update("server_flag", flag)
 }

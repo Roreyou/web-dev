@@ -51,7 +51,7 @@
 
 <script>
 //import { Scope } from 'eslint-scope';
-
+import $ from 'jquery'
 
 export default {
     data() {
@@ -79,7 +79,31 @@ export default {
           }]
         }
     },
+    mounted() {
+    // 在进入页面后立即调用的操作
+    this.getUseGPUData();
+    },
     methods: {
+      getUseGPUData() {
+        // 调用接口，获取使用记录
+        $.ajax({
+            type: 'POST',
+            url: 'http://127.0.0.1:8081/show',
+            data:{
+              user_id:sessionStorage.getItem('user_id')
+            },
+            success: (response) => {
+            // 请求成功的处理逻辑
+            console.log(response);
+            // 渲染数据到 el-table
+            //this.renderTable(response);
+            },
+            error: (xhr, status, error) => {
+            // 请求失败的处理逻辑
+            console.log('Error:' + error);
+            },
+        });
+      },
       handleDelete(index, row) {
         console.log(index, row);
         alert(index, row)

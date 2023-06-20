@@ -58,76 +58,63 @@ export default {
       },
     };
   },
-  methods: {
+  mounted(){
+    //this.ifPush()
     
+  },
+
+  methods: {
+  //   ifPush(){
+  //     let if_token =sessionStorage.getItem('token')
+  //     console.log(if_token)
+  //     if(if_token !== null)
+  //     {
+  //         this.$router.push('/manage')//用户已登录时，使其不再访问登录页面
+  //     }
+  //     },
+
+
     submit() {
        // 发送 POST 请求验证用户身份
-       $.ajax({
+       if(this.form.user_id === "admin" && this.form.user_password === "888"){
+        const token = "1";
+        sessionStorage.setItem("token", token);
+        this.$router.push('/usermanage');
+       }
+       else{
+        $.ajax({
         type: "POST",
-        url: "http://127.0.0.1:8080/user",
+        url: "http://127.0.0.1:8081/user",
         data: {
             user_id: this.form.user_id,
             user_password: this.form.user_password,
             },
             success: (response) => {
-      console.log(response);
-      // 获取用户信息
-      const token = response.token;
-      const user_id = response.UserInfo.user_id;
-      const user_name = response.UserInfo.user_name;
-      const real_name = response.UserInfo.real_name;
-      const user_password = response.UserInfo.user_password;
-      // 存储用户信息
-      sessionStorage.setItem("token", token);
-      sessionStorage.setItem("user_id", user_id);
-      sessionStorage.setItem("user_name", user_name);
-      sessionStorage.setItem("real_name", real_name);
-      sessionStorage.setItem("user_password", user_password);
-      // 将用户重定向到首页或指定页面
-      this.$router.push("/manage");
-    },
-    error: function(xhr, status, error) {
-    // 请求失败的处理逻辑
-    console.log("Error:", error);
-    alert("登录失败，请检查用户名和密码是否正确");
-  }
-      });
+        console.log(response);
+        // 获取用户信息
+        const token = response.token;
+        const user_id = response.UserInfo.user_id;
+        const user_name = response.UserInfo.user_name;
+        const real_name = response.UserInfo.real_name;
+        const user_password = response.UserInfo.user_password;
+        // 存储用户信息
+        sessionStorage.setItem("token", token);
+        sessionStorage.setItem("user_id", user_id);
+        sessionStorage.setItem("user_name", user_name);
+        sessionStorage.setItem("real_name", real_name);
+        sessionStorage.setItem("user_password", user_password);
+        // 将用户重定向到首页或指定页面
+        this.$router.push("/manage");
+        },
+        error: function(xhr, status, error) {
+        // 请求失败的处理逻辑
+        console.log("Error:", error);
+        alert("登录失败，请检查用户名和密码是否正确");
+        }
+        });
+      }
+       
    
-
-        //    .then( 
-        //     console.log("验证的id"),
-        //     console.log(this.form.user_id),
-        //     (response) => {
-        //     // 登录成功，生成并存储 token,id,password
-        //     //保存数据语法：sessionStorage.setItem("key", "value");
-        //     //读取数据语法：var lastname = sessionStorage.getItem("key");
-        //     const token = response.data.Token;
-        //     const user_id = response.data.UserInfo.User_id;
-        //     const user_name = response.data.UserInfo.User_name;
-        //     const real_name = response.data.UserInfo.Real_name;
-        //     const user_password = response.data.UserInfo.User_password ;
-        //     console.log("验证的信息");
-        //     console.log(token);
-        //     console.log(user_id);
-        //     sessionStorage.setItem("token", token);
-        //     sessionStorage.setItem("user_id",user_id);
-        //     sessionStorage.setItem("user_name",user_name);
-        //     sessionStorage.setItem("real_name",real_name);
-        //     sessionStorage.setItem("user_password",user_password);
-
-        //   //    // 将用户重定向到首页或指定页面
-        //   //   this.$router.push("/manage");
-        //   //  },
-        //   //  (error) => {
-        //   //  // 验证失败，提示错误消息
-        //   //   console.log(error);
-        //   //   alert("登录失败，请检查用户名和密码是否正确");
-        //   //   }
-        //  )
-        //  .catch(function (error) {
-        //  console.log(error);
-        //     });
-
       },
   },
   

@@ -16,12 +16,15 @@
                             width="35%"
                             :before-close="handleClose">
 
-                            <el-form ref="form" :rules="rules" :model="form" label-width="80px"> //model和定义的form绑定
+                            <el-form ref="form" :rules="rules" :model="form" label-width="80px">
                                 <el-form-item label="账号" prop="account"> <!-- prop设置的是字段名字 用于校验 对于rules中的名字 -->
                                     <el-input placeholder="请输入账号" v-model="form.account"></el-input> <!-- v-model是双向绑定 -->
                                 </el-form-item>
-                                <el-form-item label="密码" prop="password">
-                                    <el-input placeholder="请输入密码" v-model="form.password"></el-input>
+                                <el-form-item label="用户名" prop="name">
+                                    <el-input placeholder="请输入用户名" v-model="form.name"></el-input>
+                                </el-form-item>
+                                <el-form-item label="真实姓名" prop="real_name">
+                                    <el-input placeholder="请输入真实姓名" v-model="form.real_name"></el-input>
                                 </el-form-item>
                             </el-form>
 
@@ -58,8 +61,12 @@
                                     label="账号">
                                 </el-table-column>
                                 <el-table-column
-                                    prop="password"
-                                    label="密码">
+                                    prop="name"
+                                    label="用户名">
+                                </el-table-column>
+                                <el-table-column
+                                    prop="real_name"
+                                    label="真实姓名">
                                 </el-table-column>
                                 <el-table-column
                                     label="操作">
@@ -89,56 +96,86 @@ export default {
             modalType: 0,
             form: {
                 account: '',
-                password: ''
+                name: '',
+                real_name: ''
             },
             rules: {
                 account: [
-                    { required: true, message: '请输入姓名' }
+                    { required: true, message: '请输入账号' }
                 ],
-                password: [
-                    { required: true, message: '请输入年龄' }
+                name: [
+                    { required: true, message: '请输入用户名' }
+                ],
+                real_name: [
+                    { required: true, message: '请输入真实姓名' }
                 ]
             },
-            tableData: [
-                {
-                    account: '21311411',
-                    password: '88888888'
-                },
-                {
-                    account: '21311391',
-                    password: '66666666'
-                },
-                {
-                    account: '21311242',
-                    password: '99999999'
-                },
-                {
-                    account: '21311000',
-                    password: '00000000'
-                },
-            ]
+            tableData: []
         }
     },
     components: {
         ManageAside,
         CommonHeader
     },
+    mounted() {
+    // 在进入页面后立即调用的操作
+    this.getUserData();
+    },
     methods: {
+        getUserData() {
+        // 调用接口，获取使用记录
+        $.ajax({
+            type: 'POST',
+            url: 'http://127.0.0.1:8081/admin/show_user',
+            data: {},
+            success: (response) => {
+            // 请求成功的处理逻辑
+            console.log(response);
+            // 渲染数据到 el-table
+            this.renderTable(response);
+            },
+            error: (xhr, status, error) => {
+            // 请求失败的处理逻辑
+            console.log('Error:', error);
+            },
+        });
+        },
+        renderTable(data) {
+        // 将返回的数据格式转换为 el-table 所需的格式
+        this.tableData = data.map((item) => ({
+            'account': item['user_id'],
+            'name': item['user_name'],
+            'real_name': item['real_name'],
+        }));
+        },
         submit() {
             this.$refs.form.validate((valid) => { //this.$refs.form获取表单实例 validate用来校验表单 valid是返回值 bool类型
                 // console.log(valid, 'valid')
                 if (valid) { //valid为真 校验通过
                     // 后续对表单数据的处理
-                    if (this.modalType === 0) { //是否是新增 而不是编辑
-                        console.log('新增')
-                    } else {
-                        console.log('修改')
-                    }
+                    $.ajax({
+                        type: 'POST',
+                        url: 'http://127.0.0.1:8080/admin/add_user',
+                        data: {
+                            user_id: this.form.account,
+                            user_name:this.form.name,
+                            real_name:this.form.real_name,
+                        },
+                        success: (response) => {
+                        // 请求成功的处理逻辑
+                        console.log(response);
+                        alert("恭喜您添加账户成功，密码初始化为123456！")
+                        },
+                        error: (xhr, status, error) => {
+                        // 请求失败的处理逻辑
+                        console.log('Error:', error);
+                        alert("添加账户失败！")
+                        },
 
-                    // 清空表单的数据
-                    this.$refs.form.resetFields()
-                    // 关闭弹窗
-                    this.dialogVisible = false
+                    });
+                    location.reload()
+                    //关闭窗口
+                    handleClose()
                 }
             })
         },
@@ -160,24 +197,51 @@ export default {
             this.modalType = 0
             this.dialogVisible = true;
         },
-        async handleEdit(row) {
-            try {
-            const response = await this.$axios.post("/admin/init_password", {
-            user_id: this.user_id,
-            user_password: this.user_password,
-            });
-            if (response.data === "fail") {
-            this.errorMessage =
-                "Login failed. Please check your user ID and password.";
-            } else {
-            const token = response.data;
-            console.log("Login successful. Token:", token);
-            // 你可以在这里将token存储到localStorage或者Vuex中，并执行其他登录成功后的操作
-            }
-        } catch (error) {
-            console.error("Error while sending login request:", error);
-        }
+        handleEdit(row) {
+            console.log(row)
+            $.ajax({
+            type: 'POST',
+            url: 'http://127.0.0.1:8081/admin/init_password',
+            data: {
+                user_id: row.account
+            },
+            success: (response) => {
+            // 请求成功的处理逻辑
+            console.log(response);
+            alert("恭喜您！该账户密码已重置为123456！")
+            },
+            error: (xhr, status, error) => {
+            // 请求失败的处理逻辑
+            console.log('Error:', error);
+            alert("重置密码失败！")
+            },
+
+        });
         },
+        handleDelete(row){
+            console.log(row)
+            $.ajax({
+            type: 'POST',
+            url: 'http://127.0.0.1:8080/admin/delete_user',
+            data: {
+                user_id: row.account
+            },
+            success: (response) => {
+            // 请求成功的处理逻辑
+            console.log(response);
+            alert("删除成功！")
+            location.reload()
+            },
+            error: (xhr, status, error) => {
+            // 请求失败的处理逻辑
+            console.log('Error:', error);
+            alert("删除失败！")
+            location.reload()
+            },
+
+        });
+        this.getUserData();
+       } 
     }
 }
 </script>

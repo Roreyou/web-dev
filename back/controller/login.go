@@ -38,7 +38,7 @@ func LoginInfoController(c *gin.Context) { //处理登陆信息
 		saveInfo := dao.GetUserInfo(c)
 		data := struct {
 			Token    string        `json:"token"`
-			UserInfo dao.User_Info `json:"UsrInfo"`
+			UserInfo dao.User_Info `json:"UserInfo"`
 		}{
 			Token:    sign,
 			UserInfo: saveInfo,

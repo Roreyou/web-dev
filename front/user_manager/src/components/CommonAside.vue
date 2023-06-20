@@ -20,7 +20,7 @@
 }
 
 .el-menu {
-  height: 100vh;
+  height: 155vh;
   border-right: none;
 
   h3 {
