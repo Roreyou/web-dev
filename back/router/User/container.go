@@ -22,5 +22,6 @@ func DeleteContainerRoute(r *gin.Engine) { //关机
 }
 
 func ContainerInfo(r *gin.Engine) { //展示容器信息
-	r.POST("/show", controller.ShowContainerInfo)
+	UserRouter := r.Group("/user")
+	UserRouter.POST("/show", controller.ShowContainerInfo)
 }
