@@ -93,3 +93,35 @@ func FindAllCont() (cont []Container) {
 	db.Table("container").Find(&cont)
 	return cont
 }
+func FindAllMachine() (server []Server_Info) { //返回服务器信息
+	db := Openmysql()
+	defer db.Close() //把数据库的连接关闭掉
+	//2、把模型与数据库中的表对应起来
+	db.AutoMigrate(&Server_Info{})
+	db.Table("server_info").Find(&server)
+	return server
+}
+
+func AddMachine(sid string, server_type string, size string) {
+	server_id, _ := strconv.ParseInt(sid, 10, 64) //要转化成int64类型
+	server_size, _ := strconv.ParseInt(size, 10, 64)
+	db := Openmysql()
+	s := Server_Info{
+		Server_id:    int(server_id),
+		Server_type:  server_type,
+		Server_size:  int(server_size),
+		Server_state: 0,
+		Server_flag:  false,
+	}
+	if err := db.Create(&s).Error; err != nil {
+		fmt.Println("插入失败", err)
+		return
+	}
+}
+
+func DeleteMachine(sid string) {
+	server_id, _ := strconv.ParseInt(sid, 10, 64) //要转化成int64类型
+	db := Openmysql()
+	db.AutoMigrate(&Server_Info{})
+	db.Table("server_info").Where("server_id = ?", server_id).Delete(&Server_Info{})
+}

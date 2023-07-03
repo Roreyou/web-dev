@@ -20,12 +20,18 @@ func SetupRouter() *gin.Engine {
 	User.GpulinkRoute(r)
 	Admin.InitPasswordRoute(r)
 	Admin.Add_usrRoute(r)
+	Admin.DeleteServiceRoute(r)
+	Admin.AddServiceRoute(r)
 	Admin.Delete_usrRoute(r)
 	Admin.Show_usrRoute(r)
 	Admin.Show_contRoute(r)
+	Admin.AddContainerRoute(r)
+	Admin.DeleteContainerRoute(r)
+	Admin.GetServiceRoute(r)
 	User.EnterContainerRoute(r)
 	User.DeleteContainerRoute(r)
 	User.ExitContainerRoute(r)
 	User.ContainerInfo(r)
+
 	return r
 }

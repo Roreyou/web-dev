@@ -220,8 +220,9 @@ func ShowContainerInfo(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"machine_id":  machineInfo.Server_id,
-		"server_type": machineInfo.Server_type,
-		"SSH":         ssh,
+		"machine_id":       machineInfo.Server_id,
+		"server_type":      machineInfo.Server_type,
+		"SSH":              ssh,
+		"container_status": containerInfo.Container_status,
 	})
 }
