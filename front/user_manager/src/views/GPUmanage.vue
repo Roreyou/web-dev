@@ -30,10 +30,6 @@
                                     <el-input placeholder="请输入GPU显存大小" v-model="form.Size"></el-input>
                                 </el-form-item>
 
-                                <el-form-item label="SSH命令" prop="SSH">
-                                    <el-input placeholder="请输入SSH命令" v-model="form.SSH"></el-input>
-                                </el-form-item>
-
                                 <el-form-item label="框架" prop="Frame">
                                     <el-tag
                                     :key="tag"
@@ -103,11 +99,6 @@
                                 width="150">
                             </el-table-column>
                             <el-table-column
-                                prop="SSH" 
-                                label="SSH命令"
-                                width="200">
-                            </el-table-column>
-                            <el-table-column
                                 label="预装软件框架"
                                 width="550">
                                 <template slot-scope="scope">
@@ -165,31 +156,7 @@ export default {
                     { required: true, message: '请输入预装软件框架' }
                 ]
             },
-            TableDataa:[{
-                ID: '163',
-                Type: 'RTX3080',
-                Size: '10G',
-                SSH: '50501',
-                Frame: ['TensorFlow 2.8.0 + PyTorch 1.11.0 + conda/mamba + opency 4 + CUDA11.6/cudnn8.4.0 + Python3.9.12', 'TensorFlow 1.15.5 + PyTorch 1.11.0 + conda/mamba + opencv 4 + CUDA11.6/cudnn8.4.0 + Python3.8']
-            }, {
-                ID: '164',
-                Type: 'RTX3081',
-                Size: '12G',
-                SSH: '50502',
-                Frame: ['TensorFlow 1.15.5 + PyTorch 1.11.0 + conda/mamba + opencv 4 + CUDA11.6/cudnn8.4.0 + Python3.8']
-            }, {
-                ID: '165',
-                Type: 'RTX3082',
-                Size: '15G',
-                SSH: '50503',
-                Frame: ['TensorFlow 1.15.5 + PyTorch 1.11.0 + conda/mamba + opencv 4 + CUDA11.6/cudnn8.4.0 + Python3.8']
-            }, {
-                ID: '166',
-                Type: 'RTX3083',
-                Size: '14G',
-                SSH: '50504',
-                Frame: ['TensorFlow 1.15.5 + PyTorch 1.11.0 + conda/mamba + opencv 4 + CUDA11.6/cudnn8.4.0 + Python3.8']
-            }]
+            TableDataa:[]
         }
     },
     components: {
