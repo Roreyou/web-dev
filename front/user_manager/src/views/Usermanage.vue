@@ -155,7 +155,7 @@ export default {
                     // 后续对表单数据的处理
                     $.ajax({
                         type: 'POST',
-                        url: 'http://127.0.0.1:8080/admin/add_user',
+                        url: 'http://127.0.0.1:8081/admin/add_user',
                         data: {
                             user_id: this.form.account,
                             user_name:this.form.name,
@@ -222,7 +222,7 @@ export default {
             console.log(row)
             $.ajax({
             type: 'POST',
-            url: 'http://127.0.0.1:8080/admin/delete_user',
+            url: 'http://127.0.0.1:8081/admin/delete_user',
             data: {
                 user_id: row.account
             },

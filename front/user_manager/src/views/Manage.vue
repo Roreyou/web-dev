@@ -1,8 +1,27 @@
 <template>
     <el-card class="box-card">
+      <el-dialog
+          title="提示"
+          :visible.sync="dialogVisible"
+          width="35%"
+          :before-close="handleClose">
+
+          <el-form ref="form" :rules="rules" :model="form" label-width="80px">
+              <el-form-item label="密码" prop="password"> <!-- prop设置的是字段名字 用于校验 对于rules中的名字 -->
+                  <el-input placeholder="请输入服务器密码" v-model="form.account"></el-input> <!-- v-model是双向绑定 -->
+              </el-form-item>
+          </el-form>
+
+          <span slot="footer" class="dialog-footer">
+              <el-button @click="cancel">取 消</el-button> <!-- 提交表单是触发的按钮 -->
+              <el-button type="primary" @click="submit">确 定</el-button>
+          </span>
+      </el-dialog>
+
         <div slot="header" class="clearfix">
             <span>服务器列表</span>
         </div>
+
         <div class="text item">
             <el-table
                 stripe
@@ -28,6 +47,7 @@
                     width="180">
                     <template slot-scope="scope">
                         <el-switch
+                            @change="changeSwitch"
                             v-model="scope.row.State"
                             active-color="#13ce66"
                             inactive-color="#ff4949">
@@ -56,6 +76,16 @@ import $ from 'jquery'
 export default {
     data() {
         return {
+          modalType: 0, //0开机 1删除
+          dialogVisible: false,
+          form: {
+            password:'',
+            },
+            rules: {
+                password: [
+                    { required: true, message: '请输入密码' }
+                ],
+            },
             tableData:[{
             ID: '163',
             Type: 'RTX3080',
@@ -105,8 +135,43 @@ export default {
         });
       },
       handleDelete(index, row) {
-        console.log(index, row);
-        alert(index, row)
+        // console.log(index, row);
+        // alert(index, row)
+        this.modalType = 1 //删除功能
+        this.dialogVisible = true;
+
+      },
+      handleClose() {
+            this.$nextTick(() => {
+                this.form = {
+                password: ''
+                }
+                this.$refs.form.resetFields()
+            })
+            this.dialogVisible = false
+      },
+      cancel() { //点击取消时调用点击关闭同样的函数
+          this.handleClose()
+      },
+      submit(){
+        if(this.modalType === 0){
+          //开机功能的提交
+          alert("开机")
+        }
+        else if(this.modalType ===1){
+          //删除功能的提交
+          alert("删除")
+        }
+      },
+      changeSwitch(value){
+        if(value){
+          //开关从关到开
+          this.modalType = 0 //开机功能
+          this.dialogVisible = true;
+        }
+        else{
+          //开关从开到关
+        }
       }
     },
     mouted(){

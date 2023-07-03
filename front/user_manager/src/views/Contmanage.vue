@@ -74,7 +74,7 @@
                             </el-form> -->
                         </div>
 
-                        <el-table stripe height="90%" :data="TableDataa" style="width: 100%">
+                        <el-table stripe height="630px" :data="TableDataa" style="width: 100%">
                             <el-table-column prop="ID" label="容器ID" width="150">
                             </el-table-column>
 
@@ -95,8 +95,6 @@
 
                             <el-table-column label="操作">
                                 <template slot-scope="scope">
-                                    <el-button size="mini" @click="handleEdit(scope.row)">编辑</el-button>
-                                    <!-- (scope.row)是传参 当前的行数 -->
                                     <el-button type="danger" size="mini" @click="handleDelete(scope.row)">删除</el-button>
                                 </template>
                             </el-table-column>
@@ -111,6 +109,7 @@
 
 
 <script>
+import $ from 'jquery'
 import ManageAside from '@/components/ManageAside.vue';
 import CommonHeader from '@/components/CommonHeader.vue';
 export default {
@@ -120,6 +119,7 @@ export default {
             modalType: 0,
             inputVisible: false,
             inputValue: '',
+            getStatus: -1,
             form: {
                 ID: '',
                 IP: '',
@@ -145,38 +145,65 @@ export default {
                 // ]
             },
             options: [{ value: '创建' }, { value: '正在使用' }, { value: '删除' }],
-            TableDataa: [{
-                ID: '39',
-                IP: '192.168.0.1',
-                Port: '3306',
-                Status: '创建',
-                //Usetime: []
-            }, {
-                ID: '45',
-                IP: '192.168.0.3',
-                Port: '3355',
-                Status: '正在使用',
-                //Usetime: ['2022.12.15-2022.12.19', '2023.4.5-2023.4.8']
-            }, {
-                ID: '66',
-                IP: '192.168.3.2',
-                Port: '3746',
-                Status: '删除',
-                //Usetime: ['2022.12.25-2022.12.26']
-            }, {
-                ID: '88',
-                IP: '192.168.4.5',
-                Port: '3852',
-                Status: '正在使用',
-                //Usetime: ['2022.12.6-2022.12.9', '2023.2.5-2023.2.9']
-            }]
+            TableDataa: []
         }
     },
+    mounted() {
+    // 在进入页面后立即调用的操作
+    this.getContdata();
+  },
     components: {
         ManageAside,
         CommonHeader
     },
     methods: {
+        getContdata() {
+    // 调用接口，获取使用记录
+    $.ajax({
+      type: 'POST',
+      url: 'http://127.0.0.1:8081/admin/get_container',
+      data: {},
+      success: (response) => {
+        // 请求成功的处理逻辑
+        console.log(response);
+        // 渲染数据到 el-table
+        this.renderTable(response);
+      },
+      error: (xhr, status, error) => {
+        // 请求失败的处理逻辑
+        console.log('Error:', error);
+      },
+    });
+  },
+  renderTable(data) {
+    // 将返回的数据格式转换为 el-table 所需的格式
+    this.TableDataa = data.reduce((acc, item) => {
+      if (item['容器的状态'] === 2 || item['容器的状态'] === 3) {
+        acc.push({
+          'ID': item['容器ID'],
+          'IP': item['容器所在ip'],
+          'Port': item['容器端口'],
+          'Status': this.getStatusText(item['容器的状态']),
+        });
+      }
+      return acc;
+    }, []);
+  },
+  getStatusText(statusCode) {
+    if (statusCode === 2) {
+      return '已创建且未使用';
+    } else if (statusCode === 3) {
+      return '正在使用';
+    } else {
+      return '';
+    }
+  },
+
+    // judge(int num){
+    //     if(num==1){
+    //         return 
+    //     }
+    // },
         // 弹窗关闭的时候
         handleClose() {
             this.$nextTick(() => {
@@ -214,33 +241,6 @@ export default {
             this.modalType = 0
             this.dialogVisible = true;
         },
-        handleEdit(row) {
-            this.modalType = 1
-            this.dialogVisible = true
-            // 注意需要对当前行数据进行深拷贝，否则会出错
-            console.log(row)
-            this.form = JSON.parse(JSON.stringify(row))
-        },
-
-        // tagClose(tag) {
-        //     this.form.Usetime.splice(this.form.Usetime.indexOf(tag), 1);
-        // },
-
-        // tagInput() {
-        //     this.inputVisible = true;
-        //     this.$nextTick(_ => {
-        //         this.$refs.saveTagInput.$refs.input.focus();
-        //     });
-        // },
-
-        // tagInputConfirm() {
-        //     let inputValue = this.inputValue;
-        //     if (inputValue) {
-        //         this.form.Usetime.push(inputValue);
-        //     }
-        //     this.inputVisible = false;
-        //     this.inputValue = '';
-        // }
     }
 }
 </script>
@@ -249,21 +249,4 @@ export default {
 .el-header {
     padding: 0px;
 }
-// .el-tag+.el-tag {
-//     margin-left: 10px;
-// }
-
-// .button-new-tag {
-//     margin-left: 10px;
-//     height: 32px;
-//     line-height: 30px;
-//     padding-top: 0;
-//     padding-bottom: 0;
-// }
-
-// .input-new-tag {
-//     width: 90px;
-//     margin-left: 10px;
-//     vertical-align: bottom;
-// }
 </style>
