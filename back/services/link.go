@@ -20,7 +20,7 @@ func IfuserTimeout(uid string) bool { //检查用户是否超额
 	h, _ := strconv.Atoi(uh[0])
 	um := strings.Split(uh[1], "m")
 	m, _ := strconv.Atoi(um[0])
-	db.Table("container").Where("user_id = ? and container_status=2", uid).Count(&c)
+	db.Table("container").Where("user_id = ? and container_status=2 OR container_status=3", uid).Count(&c)
 	return h == 0 && m < 5 //小于五分钟就超额了
 }
 

@@ -154,3 +154,14 @@ func Add_ServiceController(c *gin.Context) {
 	})
 
 }
+
+func Update_ServiceController(c *gin.Context) {
+	server_id := c.PostForm("server_id")
+	server_type := c.PostForm("server_type")
+	server_size := c.PostForm("server_size")
+	dao.UpdateMachine(server_id, server_type, server_size)
+	c.JSON(http.StatusOK, gin.H{
+		"Success": "更新服务器成功！",
+	})
+
+}

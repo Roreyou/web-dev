@@ -118,6 +118,21 @@ func AddMachine(sid string, server_type string, size string) {
 		return
 	}
 }
+func UpdateMachine(sid string, server_type string, size string) {
+	server_id, _ := strconv.ParseInt(sid, 10, 64) //要转化成int64类型
+	server_size, _ := strconv.ParseInt(size, 10, 64)
+	db := Openmysql()
+	var server_info Server_Info
+	db.Table("server_info").Where("server_id = ?", server_id).Find(&server_info)
+	s := Server_Info{
+		Server_id:    int(server_id),
+		Server_type:  server_type,
+		Server_size:  int(server_size),
+		Server_state: server_info.Server_state,
+		Server_flag:  server_info.Server_flag,
+	}
+	db.Table("server_info").Where("server_id = ?", server_id).Update(&s)
+}
 
 func DeleteMachine(sid string) {
 	server_id, _ := strconv.ParseInt(sid, 10, 64) //要转化成int64类型

@@ -24,11 +24,7 @@ func ConnectContainer(c *gin.Context) {
 			"msg": "密码不正确",
 		})
 	} else {
-		if container.Container_status == 1 { //容器被删除
-			c.JSON(http.StatusBadRequest, gin.H{
-				"msg": "时间已超额",
-			})
-		} else if flag := dao.IsContainerUsing(); flag == true { //容器正在使用
+		if flag := dao.IsContainerUsing(); flag == true { //容器正在使用
 			c.JSON(http.StatusUnprocessableEntity, gin.H{
 				"warining": "该容器正在被使用",
 			})
@@ -79,12 +75,6 @@ func ExitContainer(c *gin.Context) { //关机
 	userid_string := c.PostForm("user_id")
 	user_id, _ := strconv.ParseInt(userid_string, 10, 64) //要转化成int64类型
 	container := dao.FindContainer(user_id)               //找到对应容器
-	if container.Container_status == 1 {                  //容器被删除
-		c.JSON(http.StatusBadRequest, gin.H{
-			"msg": "时间已超额",
-		})
-		return
-	}
 	config := &ssh.ClientConfig{
 		User: "zhangn279", //服务器的账号
 		Auth: []ssh.AuthMethod{
