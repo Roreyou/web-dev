@@ -98,8 +98,16 @@ func CreateRecord(container Container, start_time time.Time) { //创建一条使
 	defer db.Close() //把数据库的连接关闭掉
 	//2、把模型与数据库中的表对应起来
 	db.AutoMigrate(&Used_Record{})
+	var allrecord []Used_Record
 	var record Used_Record
-	db.Table("used_record").Where("user_id = ?", container.User_id).Last(&record)
+	db.Table("used_record").Where("user_id = ?", container.User_id).Take(&allrecord)
+	record = allrecord[0]
+	for i, r := range allrecord {
+		if record.Start_time.After(r.Start_time) {
+			record = r
+			fmt.Println(i)
+		}
+	}
 	var total_time time.Duration
 	rent_time := time.Now().Sub(start_time)
 	// if err != nil {
@@ -128,12 +136,21 @@ func CreateRecord(container Container, start_time time.Time) { //创建一条使
 }
 func UpdateRecord(user_id int64, end_time time.Time) bool { //退出容器后更新使用记录
 	db := Openmysql()
-	var record Used_Record
-	db.Table("used_record").Where("user_id = ?", user_id).Last(&record) //查找最新的记录,开始时间相同
+	//var record Used_Record
+	//db.Table("used_record").Where("user_id = ?", user_id).First(&record) //查找最新的记录,开始时间相同
 	// if err != nil {
 	// 	panic(err)
 	// } else { //更新记录
-
+	var allrecord []Used_Record
+	var record Used_Record
+	db.Table("used_record").Where("user_id = ?", user_id).Take(&allrecord)
+	record = allrecord[0]
+	for i, r := range allrecord {
+		if record.Start_time.After(r.Start_time) {
+			record = r
+			fmt.Println(i)
+		}
+	}
 	db.Table("used_record").Where("user_id= ? and start_time = ?", user_id, record.Start_time).Update("end_time", end_time)
 	db.Table("used_record").Where("user_id= ? and start_time = ?", user_id, record.Start_time).Update("rent_time", (end_time.Sub(record.Start_time)).String())
 	used_time, _ := time.ParseDuration(record.Used_time)

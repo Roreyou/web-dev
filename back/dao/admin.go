@@ -5,10 +5,13 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"log"
+	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"golang.org/x/crypto/ssh"
 )
 
 func Add_user(c *gin.Context) bool {
@@ -36,7 +39,7 @@ func Add_user(c *gin.Context) bool {
 	return true
 }
 
-func Delete_usr(c *gin.Context) bool {
+func Delete_user(c *gin.Context) bool {
 	db := Openmysql()
 	db.AutoMigrate(&User_Info{})
 	userid := c.PostForm("user_id")    //返回的是string类型
@@ -49,10 +52,31 @@ func Delete_usr(c *gin.Context) bool {
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return false
 	}
-
-	// 删除用户数据
 	db.Debug().Table("user_info").Where("user_id = ?", user_id).Delete(&user)
-	//db.Table("user_info").Delete(&user)
+
+	// 查询要删除的用户在container表中是否存在
+	var cont []Container
+	cont_result := db.Table("container").Where("user_id = ?", user_id).Find(&cont)
+	fmt.Println(cont)
+	if errors.Is(cont_result.Error, gorm.ErrRecordNotFound) {
+		return false
+	}
+	for i, singlecont := range cont {
+		fmt.Println(i)
+		if singlecont.Container_status == 3 || singlecont.Container_status == 2 {
+			DeleteContainerDAO(c)
+		}
+	}
+	db.Debug().Table("container").Where("user_id = ?", user_id).Delete(&cont)
+	// 查询要删除的用户在used_record表中是否存在
+	var used_record []Used_Record
+	record_result := db.Table("used_record").Where("user_id = ?", user_id).Find(&used_record)
+	fmt.Println(used_record)
+	if errors.Is(record_result.Error, gorm.ErrRecordNotFound) {
+		return false
+	}
+	db.Debug().Table("used_record").Where("user_id = ?", user_id).Delete(&used_record)
+
 	db.Close()
 	return true
 
@@ -139,4 +163,47 @@ func DeleteMachine(sid string) {
 	db := Openmysql()
 	db.AutoMigrate(&Server_Info{})
 	db.Table("server_info").Where("server_id = ?", server_id).Delete(&Server_Info{})
+}
+func DeleteContainerDAO(c *gin.Context) { //删除服务器
+	container, is_enter := UseContainer(c)
+	if !is_enter { //判断是否能进入
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
+			"msg": "密码不正确",
+		})
+	} else {
+		//ssh连接信息
+		config := &ssh.ClientConfig{
+			User: "zhangn279", //服务器的账号
+			Auth: []ssh.AuthMethod{
+				ssh.Password("ssezhangneng@972"), //服务器密码
+			},
+			HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		}
+		//连接ssh服务器
+		client, err := ssh.Dial("tcp", "172.16.108.78:2022", config)
+		if err != nil {
+			log.Fatal("Failed to dial: ", err)
+		}
+		defer client.Close()
+		//cmd := "exit" //退出容器的命令
+		//str := strconv.Itoa(container.Image_ID) //将整数转为字符串
+		str := container.Container_id
+		cmd := "docker rm " + str //删除容器
+		//创建新的会话
+		session, err := client.NewSession()
+		if err != nil {
+			panic(err)
+		}
+		defer session.Close()
+		// 在远程服务器上运行Docker命令，output就是容器信息
+		output, err := session.CombinedOutput(cmd)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(string(output))
+		UpdateContainerStatus(1, container) //将容器的状态表示已删除
+		c.JSON(http.StatusOK, gin.H{
+			"msg": "容器已删除",
+		})
+	}
 }
