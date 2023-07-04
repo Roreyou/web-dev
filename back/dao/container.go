@@ -100,22 +100,23 @@ func CreateRecord(container Container, start_time time.Time) { //创建一条使
 	db.AutoMigrate(&Used_Record{})
 	var allrecord []Used_Record
 	var record Used_Record
-	db.Table("used_record").Where("user_id = ?", container.User_id).Take(&allrecord)
-	record = allrecord[0]
-	for i, r := range allrecord {
-		if record.Start_time.After(r.Start_time) {
-			record = r
-			fmt.Println(i)
-		}
-	}
+	db.Table("used_record").Where("user_id = ?", container.User_id).Find(&allrecord)
 	var total_time time.Duration
 	rent_time := time.Now().Sub(start_time)
 	// if err != nil {
 	// 	panic(err)
 	// }
-	if (record == Used_Record{}) { //之前没有使用过该容器
+	if len(allrecord) == 0 { //之前没有使用过该容器
 		total_time = rent_time
 	} else {
+		record = allrecord[0]
+		for i, r := range allrecord {
+			if record.Start_time.Before(r.Start_time) {
+				record = r
+				fmt.Println(i)
+				fmt.Println(record)
+			}
+		}
 		used_time, _ := time.ParseDuration(record.Used_time)
 		total_time = used_time + rent_time
 		if record.Machine_id == container.Machine_id { //再次使用该机器
@@ -143,22 +144,32 @@ func UpdateRecord(user_id int64, end_time time.Time) bool { //退出容器后更
 	// } else { //更新记录
 	var allrecord []Used_Record
 	var record Used_Record
-	db.Table("used_record").Where("user_id = ?", user_id).Take(&allrecord)
+	db.Table("used_record").Where("user_id = ?", user_id).Find(&allrecord)
 	record = allrecord[0]
+	fmt.Println(record)
 	for i, r := range allrecord {
-		if record.Start_time.After(r.Start_time) {
+		if record.Start_time.Before(r.Start_time) {
 			record = r
 			fmt.Println(i)
+			fmt.Println(record)
 		}
 	}
+	oldrecord := record
+	if len(allrecord) >= 2 {
+		oldrecord = allrecord[len(allrecord)-2]
+	}
+	end_time.Local().Second()
+	fmt.Println(record)
 	db.Table("used_record").Where("user_id= ? and start_time = ?", user_id, record.Start_time).Update("end_time", end_time)
 	db.Table("used_record").Where("user_id= ? and start_time = ?", user_id, record.Start_time).Update("rent_time", (end_time.Sub(record.Start_time)).String())
-	used_time, _ := time.ParseDuration(record.Used_time)
-	rent_time, _ := time.ParseDuration(record.Rent_time)
-	new_rentTime := (used_time - rent_time + end_time.Sub(record.Start_time)).String()
-	db.Table("used_record").Where("user_id= ? and start_time = ?", user_id, record.Start_time).Update("used_time", new_rentTime)
+	used_time, _ := time.ParseDuration(oldrecord.Used_time)
+	rent_time, _ := time.ParseDuration(oldrecord.Rent_time)
+	new_usedTime := (used_time + end_time.Sub(record.Start_time)).String()
+	new_renttime := (rent_time + end_time.Sub(record.Start_time)).String()
+	db.Table("used_record").Where("user_id= ? and start_time = ?", user_id, record.Start_time).Update("used_time", new_usedTime)
 	//}
-	db.Table("used_record").Where("user_id= ? and start_time = ?", user_id, record.Start_time).First(&record)
+	db.Table("used_record").Where("user_id= ? and start_time = ?", user_id, record.Start_time).Update("rent_time", new_renttime)
+	db.Table("used_record").Where("user_id= ? and start_time = ?", user_id, record.Start_time).Last(&record)
 	return IsOutTime(record)
 }
 func UpdateContainerStatus(status int, container Container) { //更新容器的状态
