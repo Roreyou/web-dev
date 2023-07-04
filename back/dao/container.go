@@ -44,7 +44,7 @@ func FindContainer(user_id int64) Container {
 	// u1 := Container{123, "222", 111, 1, 123}
 	// db.Create(&u1)
 	var record []Container
-	db.Table("container").Where("user_id = ?,container_status", user_id, 3).Find(&record)
+	db.Table("container").Where("user_id = ?", user_id).Find(&record)
 	fmt.Println(record)
 	// if err != nil {
 	// 	panic(err)

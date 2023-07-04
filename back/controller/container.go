@@ -139,7 +139,7 @@ func ExitContainer(c *gin.Context) { //关机
 			panic(err)
 		}
 		fmt.Println(string(output))
-		dao.UpdateContainerStatus(1, container) //将容器的状态表示已删除
+		dao.UpdateContainerStatus(2, container) //将容器的状态表示已删除
 		dao.ChangserverFlag(false)
 		c.JSON(http.StatusOK, gin.H{
 			"msg":     "容器已停止使用",

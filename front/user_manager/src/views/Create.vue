@@ -1,57 +1,64 @@
 <template>
     <div>
-      <el-card class="bigbox-card">
-        <el-card class="box-card" v-for="item in GPUData" :key="item.index">
-          <div slot="header" class="clearfix">
-            <span>{{ "GPU型号：" + item.name }}</span>
-          </div>
-          <div class="text item">
-            {{ "显存大小：" + item.size }}
-          </div>
-          <div>
-            <el-radio
-              v-model="selectedGPUIndex"
-              :label="item.index"
-              border
-            >
-              选择
-            </el-radio>
-          </div>
-        </el-card>
+      <!-- <el-loading :loading="loading" :text="loadingText" :spinner="loadingSpinner" :background="loadingBackground"> -->
+        <el-card class="bigbox-card">
+          
+            <el-card class="box-card" v-for="item in GPUData" :key="item.index">
+              <div slot="header" class="clearfix">
+                <span>{{ "GPU型号：" + item.name }}</span>
+              </div>
+              <div class="text item">
+                {{ "显存大小：" + item.size }}
+              </div>
+              <div>
+                <el-radio
+                  v-model="selectedGPUIndex"
+                  :label="item.index"
+                  border
+                >
+                  选择
+                </el-radio>
+              </div>
+            </el-card>
 
-        <div class="text2">
-          选择预装软件框架
-          <br>
-          <el-select v-model="value" clearable placeholder="请选择">
-            <el-option
-              v-for="option in selectedGPUFrameList"
-              :key="option"
-              :label="option"
-              :value="option"
-            ></el-option>
-          </el-select>
-        </div>
-        
+            <div class="text2">
+              选择预装软件框架
+              <br>
+              <el-select v-model="value" clearable placeholder="请选择">
+                <el-option
+                  v-for="option in selectedGPUFrameList"
+                  :key="option"
+                  :label="option"
+                  :value="option"
+                ></el-option>
+              </el-select>
+            </div>
+            
 
-        <div class="text2">
-          设置服务器登录密码(弱密码有资料泄露风险 请务必设置复杂密码)  
-          <el-input placeholder="请输入密码" v-model="input" show-password></el-input>
-        </div>
+            <div class="text2">
+              设置服务器登录密码(弱密码有资料泄露风险 请务必设置复杂密码)  
+              <el-input placeholder="请输入密码" v-model="input" show-password></el-input>
+            </div>
 
-        <div class="text2">
-          <el-checkbox v-model="checked">我已阅读并同意使用须知</el-checkbox>
-        </div>
+            <div class="text2">
+              <el-checkbox v-model="checked">我已阅读并同意使用须知</el-checkbox>
+            </div>
 
-        <el-button type="warning" @click="createGPU" round>创建</el-button>
-      </el-card>
+            <el-button :disabled="isLoading" type="warning" @click="createGPU" round>创建</el-button>
+          </el-card>
+      <!-- </el-loading> -->
     </div>
   </template>
   
   <script>
-    import $ from 'jquery'
+  import { Loading } from 'element-ui';
+
+  import $ from 'jquery'
   export default {
     data() {
       return {
+        isLoading:false,
+        //loading: false,
         checked: false,
         input: '',
         value: '',
@@ -65,6 +72,14 @@
     this.getAccessGPUData();
     },
     methods:{
+      showLoading(){
+        this.isLoading=true;
+        Loading.service({
+          fullscreen:true,
+          background:'rgba(0,0,0,0.7)',
+          lock:true
+        });
+      },
       getAccessGPUData() {
         // 调用接口，获取使用记录
         $.ajax({
@@ -92,6 +107,7 @@
       },
       createGPU(){
         if(this.input!==''&&this.value!==''&&this.selectedGPUIndex!==''&&this.checked===true){
+          //this.loading = true; // 显示加载界面
           console.log("byebye!")
           var new_value="0"
           if(this.value==='tensorflow2.1.0+pythorch1.11+python3.6.9'){
@@ -117,13 +133,24 @@
                 success: (response) => {
                 // 请求成功的处理逻辑
                 console.log(response);
-                alert("恭喜您创建GPU成功！")
+                this.showLoading;
+                setTimeout(()=>{
+                  alert("恭喜您创建GPU成功！")
+                  this.isLoading=false;
+                Loading.service().close();
+                });
+                
+
+                
                 },
                 error: (xhr, status, error) => {
                 // 请求失败的处理逻辑
                 console.log('Error:', error);
                 alert("创建GPU失败！")
                 },
+                complete: () => {
+                //this.loading = false; // 隐藏加载界面
+              }
            });
         }
         else{

@@ -8,7 +8,7 @@
 
           <el-form ref="form" :rules="rules" :model="form" label-width="80px">
               <el-form-item label="密码" prop="password"> <!-- prop设置的是字段名字 用于校验 对于rules中的名字 -->
-                  <el-input placeholder="请输入服务器密码" v-model="form.account"></el-input> <!-- v-model是双向绑定 -->
+                  <el-input placeholder="请输入服务器密码" v-model="form.password"></el-input> <!-- v-model是双向绑定 -->
               </el-form-item>
           </el-form>
 
@@ -83,30 +83,10 @@ export default {
             },
             rules: {
                 password: [
-                    { required: true, message: '请输入密码' }
+                    { required: false,  trigger: "blur", message: '请输入密码' }
                 ],
             },
-            tableData:[{
-            ID: '163',
-            Type: 'RTX3080',
-            SSH: '50501',
-            State: true
-          }, {
-            ID: '164',
-            Type: 'RTX3081',
-            SSH: '50502',
-            State: true
-          }, {
-            ID: '165',
-            Type: 'RTX3082',
-            SSH: '50503',
-            State: true
-          }, {
-            ID: '166',
-            Type: 'RTX3083',
-            SSH: '50504',
-            State: true
-          }]
+            tableData:[]
         }
     },
     mounted() {
@@ -116,9 +96,10 @@ export default {
     methods: {
       getUseGPUData() {
         // 调用接口，获取使用记录
+        console.log(sessionStorage.getItem('user_id'))
         $.ajax({
             type: 'POST',
-            url: 'http://127.0.0.1:8081/show',
+            url: 'http://127.0.0.1:8081/user/show',
             data:{
               user_id:sessionStorage.getItem('user_id')
             },
@@ -126,7 +107,7 @@ export default {
             // 请求成功的处理逻辑
             console.log(response);
             // 渲染数据到 el-table
-            //this.renderTable(response);
+            this.renderTable(response);
             },
             error: (xhr, status, error) => {
             // 请求失败的处理逻辑
@@ -134,6 +115,27 @@ export default {
             },
         });
       },
+      renderTable(item) {
+        this.tableData.splice(0); // 清空tableData数组
+        if(item['container_status']===2||item['container_status']===3){
+          this.tableData.push({
+          'ID': item['machine_id'],
+          'Type': item['server_type'],
+          'SSH': item['SSH'],
+          //'State': false,
+          'State': this.getStatusText(item['container_status'])
+        });
+        }       
+      },
+  getStatusText(statusCode) {
+    if (statusCode === 2) {
+      return false;//处于关机状态
+    } else if (statusCode === 3) {
+      return true;//处于开机状态
+    } else {
+      return '';
+    }
+  },
       handleDelete(index, row) {
         // console.log(index, row);
         // alert(index, row)
@@ -148,6 +150,7 @@ export default {
                 }
                 this.$refs.form.resetFields()
             })
+            this.getUseGPUData();
             this.dialogVisible = false
       },
       cancel() { //点击取消时调用点击关闭同样的函数
@@ -156,12 +159,58 @@ export default {
       submit(){
         if(this.modalType === 0){
           //开机功能的提交
-          alert("开机")
+          console.log(sessionStorage.getItem('user_id'))
+          console.log(this.form.password)
+          alert("开机"),
+          $.ajax({
+            type: 'POST',
+            url: 'http://127.0.0.1:8081/user/work',
+            data: {
+              user_id: sessionStorage.getItem('user_id'),
+              container_password:this.form.password,
+            },
+            success: (response) => {
+            // 请求成功的处理逻辑
+            console.log("你是成功的人士");
+            console.log(response);
+            // 更改开关状态至绿色
+            this.getUseGPUData();
+            },
+            error: (xhr, status, error) => {
+            // 请求失败的处理逻辑
+            console.log("你是嗯嗯的人士");
+            console.log('Error:', error);
+            },
+        });
         }
         else if(this.modalType ===1){
           //删除功能的提交
           alert("删除")
+
+          $.ajax({
+            type: 'POST',
+            url: 'http://127.0.0.1:8081/user/close',
+            data: {
+              user_id: sessionStorage.getItem('user_id'),
+              container_password:this.form.password,
+            },
+            success: (response) => {
+            // 请求成功的处理逻辑
+            console.log("你是成功的人士");
+            console.log(response);
+            // 更改开关状态至绿色
+            this.getUseGPUData();
+            },
+            error: (xhr, status, error) => {
+            // 请求失败的处理逻辑
+            console.log("你是嗯嗯的人士");
+            console.log('Error:', error);
+            },
+        });
         }
+
+        this.handleClose();
+
       },
       changeSwitch(value){
         if(value){
@@ -171,6 +220,43 @@ export default {
         }
         else{
           //开关从开到关
+          this.$confirm('是否停止使用服务器?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+          }).then(() => {
+
+            //
+            $.ajax({
+              type: 'POST',
+              url: 'http://127.0.0.1:8081/user/exit',
+              data: {
+                user_id: sessionStorage.getItem('user_id'),
+              },
+              success: (response) => {
+              // 请求成功的处理逻辑
+              console.log("你是成功的人士");
+              console.log(response);
+              // 更改开关状态至绿色
+              this.getUseGPUData();
+              },
+              error: (xhr, status, error) => {
+              // 请求失败的处理逻辑
+              console.log("你是嗯嗯的人士");
+              console.log('Error:', error);
+              },
+            });
+
+            this.$message({
+              type: 'success',
+              message: '关机成功!'
+            });
+          }).catch(() => {
+            this.$message({
+              type: 'info',
+              message: '已取消关机'
+            });          
+          });
         }
       }
     },

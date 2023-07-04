@@ -80,7 +80,7 @@
 
                         <el-table
                             stripe
-                            height="90%"
+                            height="630px"
                             :data="TableDataa"
                             style="width: 100%">
                             <el-table-column
@@ -123,6 +123,7 @@
 </template>
 
 <script>
+import $ from 'jquery'
 import ManageAside from '@/components/ManageAside.vue';
 import CommonHeader from '@/components/CommonHeader.vue';
 export default {
@@ -136,7 +137,6 @@ export default {
                 ID: '',
                 Type: '',
                 Size: '',
-                SSH: '',
                 Frame: []
             },
             rules: {
@@ -149,9 +149,6 @@ export default {
                 Size: [
                     { required: true, message: '请输入GPU显存大小' }
                 ],
-                SSH: [
-                    { required: true, message: '请输入SSH命令' }
-                ],
                 Frame: [
                     { required: true, message: '请输入预装软件框架' }
                 ]
@@ -163,7 +160,61 @@ export default {
         ManageAside,
         CommonHeader
     },
+    mounted() {
+    // 在进入页面后立即调用的操作
+    this.getGPUData();
+    },
     methods: {
+        getGPUData() {
+        // 调用接口，获取使用记录
+        $.ajax({
+            type: 'POST',
+            url: 'http://127.0.0.1:8081/admin/get_server',
+            data: {},
+            success: (response) => {
+            // 请求成功的处理逻辑
+            console.log(response);
+            // 渲染数据到 el-table
+            this.renderTable(response);
+            },
+            error: (xhr, status, error) => {
+            // 请求失败的处理逻辑
+            console.log('Error:', error);
+            },
+        });
+        },
+        renderTable(data) {
+        // 检查数据是否为数组
+        if (Array.isArray(data)) {
+            this.TableDataa = data.map((item) => ({
+            'ID': item['server_id'],
+            'Type': item['sever_type'],
+            'Size': item['server_size'],
+            'Frame': ['tensorflow2.1.0+pythorch1.11+python3.6.9', 'tensorflow2.6.0+pythorch1.11+python3.9.0']
+            }));
+        } else {
+            this.TableDataa = []; // 如果数据不是数组，将 TableDataa 设置为空数组
+        }
+    },
+
+    handleDelete(row){
+            console.log(row)
+            $.ajax({
+            type: 'POST',
+            url: 'http://127.0.0.1:8081/admin/delete_server',
+            data: {
+                server_id:row.ID,
+            },
+            success: (response) => {
+            // 请求成功的处理逻辑
+            console.log(response);
+            alert("删除成功！")
+            location.reload()
+            },
+            
+        });
+        this.getUserData();
+       },
         // 提交用户表单
         submit() {
             this.$refs.form.validate((valid) => { //this.$refs.form获取表单实例 validate用来校验表单 valid是返回值 bool类型
@@ -172,8 +223,42 @@ export default {
                     // 后续对表单数据的处理
                     if (this.modalType === 0) { //是否是新增 而不是编辑
                         console.log('新增')
+                        //新增的逻辑
+                        $.ajax({
+                            type: 'POST',
+                            url: 'http://127.0.0.1:8081/admin/add_server',
+                            data: {
+                                server_id: this.form.ID,
+                                server_type: this.form.Type,
+                                server_size: this.form.Size,
+                            },
+                            success: (response) => {
+                            // 请求成功的处理逻辑
+                            console.log(response);
+                            // 渲染数据到 el-table
+                            this.renderTable(response);
+                            }
+                        });
+                        this.getGPUData();
                     } else {
                         console.log('修改')
+                        //编辑按钮的接口实现
+                        $.ajax({
+                            type: 'POST',
+                            url: 'http://127.0.0.1:8081/admin/update_server',
+                            data: {
+                                server_id: this.form.ID,
+                                server_type: this.form.Type,
+                                server_size: this.form.Size,
+                            },
+                            success: (response) => {
+                            // 请求成功的处理逻辑
+                            console.log(response);
+                            // 渲染数据到 el-table
+                            this.renderTable(response);
+                            }
+                        });
+                        this.getGPUData();
                     }
 
                     // 清空表单的数据

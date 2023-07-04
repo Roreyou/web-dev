@@ -14,27 +14,22 @@
 
                             <el-form ref="form" :rules="rules" :model="form" label-width="80px">
                                 <!-- model是属性不是v-model --> <!-- rules属性是添加校验 对应return中的rules -->
-                                <el-form-item label="容器ID" prop="ID">
-                                    <el-input placeholder="请输入容器ID" v-model="form.ID"></el-input>
+                                <el-form-item label="用户ID" prop="UserID">
+                                    <el-input placeholder="请输入用户ID" v-model="form.UserID"></el-input>
                                 </el-form-item>
 
-                                <el-form-item label="容器IP" prop="IP"> <!-- prop设置的是字段名字 用于校验 对于rules中的名字 -->
-                                    <el-input placeholder="请输入容器IP" v-model="form.IP"></el-input> <!-- v-model是双向绑定 -->
+                                <el-form-item label="服务器ID" prop="SeverID"> <!-- prop设置的是字段名字 用于校验 对于rules中的名字 -->
+                                    <el-input placeholder="请输入服务器ID" v-model="form.SeverID"></el-input> <!-- v-model是双向绑定 -->
                                 </el-form-item>
 
-                                <el-form-item label="端口" prop="Port">
-                                    <el-input placeholder="请输入容器端口号" v-model="form.Port"></el-input>
+                                <el-form-item label="镜像ID" prop="ImageID">
+                                    <el-input placeholder="请输入镜像ID" v-model="form.ImageID"></el-input>
                                 </el-form-item>
 
-                                <el-form-item label="状态" prop="Status">
-                                    <template>
-                                        <el-select v-model="form.Status" placeholder="请选择容器状态">
-                                            <el-option v-for="item in options" :key="item.value" :label="item.value"
-                                                :value="item.value">
-                                            </el-option>
-                                        </el-select>
-                                    </template>
+                                <el-form-item label="容器密码" prop="Password">
+                                    <el-input placeholder="请输入容器密码" v-model="form.Password"></el-input>
                                 </el-form-item>
+
 
                                 <!-- <el-form-item label="使用时间" prop="Usetime">
                                     <el-tag :key="tag" v-model="form.Usetime" v-for="tag in form.Usetime" closable
@@ -75,7 +70,14 @@
                         </div>
 
                         <el-table stripe height="630px" :data="TableDataa" style="width: 100%">
-                            <el-table-column prop="ID" label="容器ID" width="150">
+                            
+                            <el-table-column prop="UserID" label="用户ID" width="200">
+                            </el-table-column>
+                            
+                            <el-table-column prop="Password" label="容器密码" width="200">
+                            </el-table-column>
+                            
+                            <el-table-column prop="ID" label="镜像ID" width="150">
                             </el-table-column>
 
                             <el-table-column prop="IP" label="容器IP" width="200"> <!-- 这个name是数据中的字段名 和上面无关 -->
@@ -121,30 +123,29 @@ export default {
             inputValue: '',
             getStatus: -1,
             form: {
-                ID: '',
-                IP: '',
-                Port: '',
-                Status: '',
+                UserID: '',
+                SeverID: '',
+                ImageID: '',
+                Password: '',
                 //Usetime: []
             },
             rules: {
-                ID: [
-                    { required: true, message: '请输入容器ID' } //message是错误时出现的信息 每一个{}代表一条规则
+                UserID: [
+                    { required: true, message: '请输入用户ID' } //message是错误时出现的信息 每一个{}代表一条规则
                 ],
-                IP: [
-                    { required: true, message: '请输入容器IP' }
+                SeverID: [
+                    { required: true, message: '请输入服务器ID' }
                 ],
-                Port: [
-                    { required: true, message: '请输入容器端口号' }
+                ImageID: [
+                    { required: true, message: '请输入镜像ID' }
                 ],
-                Status: [
-                    { required: true, message: '请输入容器状态' }
+                Password: [
+                    { required: true, message: '请输入容器密码' }
                 ],
                 // Usetime: [
                 //     { required: true, message: '请输入容器使用时间' }
                 // ]
             },
-            options: [{ value: '创建' }, { value: '正在使用' }, { value: '删除' }],
             TableDataa: []
         }
     },
@@ -176,11 +177,13 @@ export default {
     });
   },
   renderTable(data) {
-    // 将返回的数据格式转换为 el-table 所需的格式
+  if (Array.isArray(data)) {
     this.TableDataa = data.reduce((acc, item) => {
       if (item['容器的状态'] === 2 || item['容器的状态'] === 3) {
         acc.push({
-          'ID': item['容器ID'],
+          'UserID': item['创建容器的用户'],
+          'Password': item['容器密码'],
+          'ID': item['镜像ID'],
           'IP': item['容器所在ip'],
           'Port': item['容器端口'],
           'Status': this.getStatusText(item['容器的状态']),
@@ -188,7 +191,10 @@ export default {
       }
       return acc;
     }, []);
-  },
+  } else {
+    this.TableDataa = []; // Assign an empty array if data is not an array
+  }
+},
   getStatusText(statusCode) {
     if (statusCode === 2) {
       return '已创建且未使用';
@@ -198,6 +204,7 @@ export default {
       return '';
     }
   },
+  
 
     // judge(int num){
     //     if(num==1){
@@ -221,6 +228,26 @@ export default {
         cancel() { //点击取消时调用点击关闭同样的函数
             this.handleClose()
         },
+        handleDelete(row){
+            console.log(row)
+            $.ajax({
+            type: 'POST',
+            url: 'http://127.0.0.1:8081/admin/delete_container',
+            data: {
+                user_id:row.UserID,
+                container_password:row.Password
+
+            },
+            success: (response) => {
+            // 请求成功的处理逻辑
+            console.log(response);
+            alert("删除成功！")
+            location.reload()
+            },
+            
+        });
+        this.getContdata();
+       },
         // 提交用户表单
         submit() {
             this.$refs.form.validate((valid) => { //this.$refs.form获取表单实例 validate用来校验表单 valid是返回值 bool类型
@@ -228,11 +255,27 @@ export default {
                 if (valid) { //valid为真 校验通过
                     // 后续对表单数据的处理
                     if (this.modalType === 0) { //是否是新增 而不是编辑
-                        console.log('新增')
+                        $.ajax({
+                            type: 'POST',
+                            url: 'http://127.0.0.1:8081/admin/add_container',
+                            data: {
+                                user_id:this.form.UserID,
+                                server_id: this.form.SeverID,
+                                image_id: this.form.ImageID,
+                                user_password: this.form.Password,
+                            },
+                            success: (response) => {
+                            // 请求成功的处理逻辑
+                            console.log(response);
+                            // 渲染数据到 el-table
+                            this.renderTable(response);
+                            }
+                        });
+                        
                     } else {
                         console.log('修改')
                     }
-
+                    this.getContdata();
                     this.handleClose();
                 }
             })

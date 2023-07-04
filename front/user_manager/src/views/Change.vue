@@ -95,7 +95,7 @@ import $ from 'jquery'
    submitForm(formName) {
             $.ajax({
           type: "POST",
-          url: "http://127.0.0.1:8080/user/change_password",
+          url: "http://127.0.0.1:8081/user/change_password",
           data: {
             // 请求的数据
             user_id: sessionStorage.getItem("user_id"),
