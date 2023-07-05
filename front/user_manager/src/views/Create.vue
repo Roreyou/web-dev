@@ -1,8 +1,6 @@
 <template>
     <div>
-      <!-- <el-loading :loading="loading" :text="loadingText" :spinner="loadingSpinner" :background="loadingBackground"> -->
-        <el-card class="bigbox-card">
-          
+        <el-card v-loading="loading" class="bigbox-card">
             <el-card class="box-card" v-for="item in GPUData" :key="item.index">
               <div slot="header" class="clearfix">
                 <span>{{ "GPU型号：" + item.name }}</span>
@@ -44,21 +42,19 @@
               <el-checkbox v-model="checked">我已阅读并同意使用须知</el-checkbox>
             </div>
 
-            <el-button :disabled="isLoading" type="warning" @click="createGPU" round>创建</el-button>
+            <el-button type="warning" @click="createGPU" round>创建</el-button>
           </el-card>
-      <!-- </el-loading> -->
     </div>
   </template>
   
   <script>
   import { Loading } from 'element-ui';
-
   import $ from 'jquery'
   export default {
     data() {
       return {
-        isLoading:false,
-        //loading: false,
+        //isLoading:false,
+        loading: false,
         checked: false,
         input: '',
         value: '',
@@ -72,14 +68,14 @@
     this.getAccessGPUData();
     },
     methods:{
-      showLoading(){
-        this.isLoading=true;
-        Loading.service({
-          fullscreen:true,
-          background:'rgba(0,0,0,0.7)',
-          lock:true
-        });
-      },
+      // showLoading(){
+      //   this.isLoading=true;
+      //   Loading.service({
+      //     fullscreen:true,
+      //     background:'rgba(0,0,0,0.7)',
+      //     lock:true
+      //   });
+      // },
       getAccessGPUData() {
         // 调用接口，获取使用记录
         $.ajax({
@@ -105,9 +101,11 @@
             'size': item['server_size'],
         }));
       },
+ 
       createGPU(){
         if(this.input!==''&&this.value!==''&&this.selectedGPUIndex!==''&&this.checked===true){
-          //this.loading = true; // 显示加载界面
+          this.loading = true; // 显示加载界面
+          //this.showLoading;
           console.log("byebye!")
           var new_value="0"
           if(this.value==='tensorflow2.1.0+pythorch1.11+python3.6.9'){
@@ -120,6 +118,8 @@
           console.log("server_id="+this.selectedGPUIndex)
           console.log("image_id="+new_value)
           console.log("user_password="+this.input)
+          
+          
           $.ajax({
                 type: 'POST',
                 url: 'http://127.0.0.1:8081/user/create_gpu',
@@ -132,25 +132,20 @@
                 },
                 success: (response) => {
                 // 请求成功的处理逻辑
+                this.loading = false;
                 console.log(response);
-                this.showLoading;
-                setTimeout(()=>{
                   alert("恭喜您创建GPU成功！")
-                  this.isLoading=false;
-                Loading.service().close();
-                });
-                
-
-                
                 },
                 error: (xhr, status, error) => {
                 // 请求失败的处理逻辑
+                this.loading = false;
                 console.log('Error:', error);
                 alert("创建GPU失败！")
                 },
-                complete: () => {
-                //this.loading = false; // 隐藏加载界面
-              }
+              
+    //           complete: () => {
+    //           this.isLoading = false; // 隐藏 loading
+    // }
            });
         }
         else{
