@@ -23,7 +23,7 @@
                     width="200px">
                 </el-table-column>
                 <el-table-column
-                    prop="本次租用服务器的时间"
+                    prop="本服务器累计租用时长"
                     label="本次租用总时长"
                     width="200px">
                 </el-table-column>

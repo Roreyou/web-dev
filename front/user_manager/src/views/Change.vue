@@ -13,6 +13,10 @@
             <el-input class="board" v-model="ruleForm.account" autocomplete="off" :disabled="true"></el-input>
         </el-form-item>
 
+        <el-form-item label="剩余额度">
+            <el-input class="board" v-model="ruleForm.remainder" autocomplete="off" :disabled="true"></el-input>
+        </el-form-item>
+
         <el-form-item label="旧密码" prop="oldPass">
             <el-input class="board" type="password" v-model="ruleForm.oldPass" autocomplete="off"></el-input>
         </el-form-item>
@@ -74,6 +78,7 @@ import $ from 'jquery'
           user_name:sessionStorage.getItem("user_name"),
           real_name:sessionStorage.getItem("real_name"),
           account:sessionStorage.getItem("user_id"),
+          remainder:sessionStorage.getItem("remainder"),
           oldPass: '',
           pass: '',
           checkPass: ''

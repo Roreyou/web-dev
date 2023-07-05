@@ -96,12 +96,14 @@ export default {
         const user_id = response.UserInfo.user_id;
         const user_name = response.UserInfo.user_name;
         const real_name = response.UserInfo.real_name;
+        const remainder = response.UserInfo.remainder;
         const user_password = response.UserInfo.user_password;
         // 存储用户信息
         sessionStorage.setItem("token", token);
         sessionStorage.setItem("user_id", user_id);
         sessionStorage.setItem("user_name", user_name);
         sessionStorage.setItem("real_name", real_name);
+        sessionStorage.setItem("remainder", remainder);
         sessionStorage.setItem("user_password", user_password);
         // 将用户重定向到首页或指定页面
         this.$router.push("/manage");

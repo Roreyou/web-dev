@@ -69,9 +69,15 @@
                                     label="真实姓名">
                                 </el-table-column>
                                 <el-table-column
-                                    label="操作">
+                                    prop="remainder"
+                                    label="剩余时长">
+                                </el-table-column>
+                                <el-table-column
+                                    label="操作"
+                                    width="280">
                                     <template slot-scope="scope">
                                         <el-button size="mini" @click="handleEdit(scope.row)">重置密码</el-button>
+                                        <el-button size="mini" @click="editRemainder(scope.row)">重置额度</el-button>
                                         <el-button type="danger" size="mini" @click="handleDelete(scope.row)">删除</el-button>
                                     </template>
                                 </el-table-column>
@@ -145,6 +151,7 @@ export default {
         this.tableData = data.map((item) => ({
             'account': item['user_id'],
             'name': item['user_name'],
+            'remainder': item['remainder'],
             'real_name': item['real_name'],
         }));
         },
@@ -196,6 +203,26 @@ export default {
         handleAdd() {
             this.modalType = 0
             this.dialogVisible = true;
+        },
+        editRemainder(row){
+            console.log(row)
+            $.ajax({
+                type: 'POST',
+                url: 'http://127.0.0.1:8081/admin/change_remainder',
+                data: {
+                    user_id: row.account
+                },
+                success: (response) => {
+                // 请求成功的处理逻辑
+                console.log(response);
+                alert("恭喜您！该账户剩余额度已重置为10h！")
+                },
+                error: (xhr, status, error) => {
+                // 请求失败的处理逻辑
+                console.log('Error:', error);
+                alert("重置额度失败！")
+                },
+            });
         },
         handleEdit(row) {
             console.log(row)

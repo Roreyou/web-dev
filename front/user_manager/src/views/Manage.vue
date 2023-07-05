@@ -218,7 +218,7 @@ export default {
             error: (xhr, status, error) => {
             // 请求失败的处理逻辑
             this.loading=false
-            alert("密码不正确，删除容器失败！")
+            alert("删除容器失败，请检查密码或者容器状态！")
             console.log("你是嗯嗯的人士");
             console.log('Error:', error);
             },

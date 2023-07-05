@@ -44,10 +44,11 @@ func StorecontainerInfo(imd int, psw string, cid string, mid int, uid int) {
 }
 
 func GreateDocker(mid string, uid string, did string, pwd string) int {
+
 	if IfuserTimeout(uid) {
 		return 1
 	}
-
+	fmt.Println("ye1")
 	if c > 0 {
 		return 3
 	}
@@ -58,9 +59,9 @@ func GreateDocker(mid string, uid string, did string, pwd string) int {
 		},
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
-
+	fmt.Println("ye2")
 	// 连接SSH服务器
-	sshClient, err := ssh.Dial("tcp", "ssh.schoolresearch.one:21006", sshConfig)
+	sshClient, err := ssh.Dial("tcp", "172.16.108.78:2022", sshConfig)
 	if err != nil {
 		panic(err)
 	}
@@ -83,7 +84,7 @@ func GreateDocker(mid string, uid string, did string, pwd string) int {
 		iid = "czq/tf2.8:v1.0"
 		dun = "mist"
 	}
-
+	fmt.Println("ye3")
 	cmd := "docker create --gpus " + `"` + "device=" + mid + `"` + " -it -p 20000:22 --name tensorflow" + uid + " " + iid + " bash"
 	commands := []string{
 		cmd,
