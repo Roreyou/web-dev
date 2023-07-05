@@ -56,7 +56,7 @@ func Delete_usrContrller(c *gin.Context) {
 				})
 			}
 		}*/
-	if_success := dao.Delete_usr(c)
+	if_success := dao.Delete_user(c)
 	if if_success {
 		c.JSON(http.StatusOK, gin.H{
 			"Success": "删除成功！",
