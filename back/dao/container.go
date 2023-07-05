@@ -163,7 +163,7 @@ func UpdateRecord(user_id int64, end_time time.Time) bool { //退出容器后更
 	db.Table("used_record").Where("user_id= ? and start_time = ?", user_id, record.Start_time).Update("end_time", end_time)
 	db.Table("used_record").Where("user_id= ? and start_time = ?", user_id, record.Start_time).Update("rent_time", (end_time.Sub(record.Start_time)).String())
 	used_time, _ := time.ParseDuration(oldrecord.Used_time)
-	rent_time, _ := time.ParseDuration(oldrecord.Rent_time)
+	rent_time, _ := time.ParseDuration(record.Rent_time)
 	new_usedTime := (used_time + end_time.Sub(record.Start_time)).String()
 	new_renttime := (rent_time + end_time.Sub(record.Start_time)).String()
 	db.Table("used_record").Where("user_id= ? and start_time = ?", user_id, record.Start_time).Update("used_time", new_usedTime)
@@ -179,6 +179,7 @@ func UpdateContainerStatus(status int, container Container) { //更新容器的�
 func IsOutTime(record Used_Record) bool { //容器使用是否超出额度
 	used_hour := strings.Split(record.Used_time, "h")
 	hour, _ := strconv.Atoi(used_hour[0])
+	Cut_Remainder(record)
 	return hour >= 10
 }
 func IsContainerUsing() bool { //是否有正在使用的容器

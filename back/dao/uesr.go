@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -129,4 +130,14 @@ func add_time() {
 		db.Table("used_record").Where("user_id= ?", 2).Update("start_time", tt1)
 		db.Table("used_record").Where("user_id= ?", 2).Update("end_time", tt1)
 	*/
+}
+
+func Cut_Remainder(record Used_Record) {
+	db := Openmysql()
+	db.Model(&User_Info{})
+	var user User_Info
+	db.Table("user_info").Where("user_id= ?", record.User_id).First(&user)
+	remainder, _ := time.ParseDuration(user.Remainder)
+	new_remainder := remainder - (record.End_time.Sub(record.Start_time))
+	db.Table("user_info").Where("user_id= ?", record.User_id).Update("remainder", new_remainder.String())
 }

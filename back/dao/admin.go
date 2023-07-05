@@ -165,45 +165,39 @@ func DeleteMachine(sid string) {
 	db.Table("server_info").Where("server_id = ?", server_id).Delete(&Server_Info{})
 }
 func DeleteContainerDAO(c *gin.Context) { //删除服务器
-	container, is_enter := UseContainer(c)
-	if !is_enter { //判断是否能进入
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"msg": "密码不正确",
-		})
-	} else {
-		//ssh连接信息
-		config := &ssh.ClientConfig{
-			User: "zhangn279", //服务器的账号
-			Auth: []ssh.AuthMethod{
-				ssh.Password("ssezhangneng@972"), //服务器密码
-			},
-			HostKeyCallback: ssh.InsecureIgnoreHostKey(),
-		}
-		//连接ssh服务器
-		client, err := ssh.Dial("tcp", "172.16.108.78:2022", config)
-		if err != nil {
-			log.Fatal("Failed to dial: ", err)
-		}
-		defer client.Close()
-		//cmd := "exit" //退出容器的命令
-		//str := strconv.Itoa(container.Image_ID) //将整数转为字符串
-		str := container.Container_id
-		cmd := "docker rm " + str //删除容器
-		//创建新的会话
-		session, err := client.NewSession()
-		if err != nil {
-			panic(err)
-		}
-		defer session.Close()
-		// 在远程服务器上运行Docker命令，output就是容器信息
-		output, err := session.CombinedOutput(cmd)
-		if err != nil {
-			panic(err)
-		}
-		fmt.Println(string(output))
-		UpdateContainerStatus(1, container) //将容器的状态表示已删除
-		c.JSON(http.StatusOK, gin.H{
-			"msg": "容器已删除",
-		})
+	container, _ := UseContainer(c)
+	//ssh连接信息
+	config := &ssh.ClientConfig{
+		User: "zhangn279", //服务器的账号
+		Auth: []ssh.AuthMethod{
+			ssh.Password("ssezhangneng@972"), //服务器密码
+		},
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
+	//连接ssh服务器
+	client, err := ssh.Dial("tcp", "172.16.108.78:2022", config)
+	if err != nil {
+		log.Fatal("Failed to dial: ", err)
+	}
+	defer client.Close()
+	//cmd := "exit" //退出容器的命令
+	//str := strconv.Itoa(container.Image_ID) //将整数转为字符串
+	str := container.Container_id
+	cmd := "docker rm " + str //删除容器
+	//创建新的会话
+	session, err := client.NewSession()
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+	// 在远程服务器上运行Docker命令，output就是容器信息
+	output, err := session.CombinedOutput(cmd)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(string(output))
+	UpdateContainerStatus(1, container) //将容器的状态表示已删除
+	c.JSON(http.StatusOK, gin.H{
+		"msg": "容器已删除",
+	})
 }
