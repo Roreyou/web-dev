@@ -1,5 +1,5 @@
 <template>
-    <el-card class="box-card">
+    <el-card v-loading="loading" class="box-card">
       <el-dialog
           title="提示"
           :visible.sync="dialogVisible"
@@ -76,6 +76,7 @@ import $ from 'jquery'
 export default {
     data() {
         return {
+          loading: false,
           modalType: 0, //0开机 1删除
           dialogVisible: false,
           form: {
@@ -159,9 +160,9 @@ export default {
       submit(){
         if(this.modalType === 0){
           //开机功能的提交
+          this.loading=true
           console.log(sessionStorage.getItem('user_id'))
           console.log(this.form.password)
-          alert("开机"),
           $.ajax({
             type: 'POST',
             url: 'http://127.0.0.1:8081/user/work',
@@ -171,6 +172,7 @@ export default {
             },
             success: (response) => {
             // 请求成功的处理逻辑
+            this.loading=false
             console.log("你是成功的人士");
             console.log(response);
             // 更改开关状态至绿色
@@ -178,6 +180,7 @@ export default {
             },
             error: (xhr, status, error) => {
             // 请求失败的处理逻辑
+            this.loading=false
             console.log("你是嗯嗯的人士");
             console.log('Error:', error);
             },
@@ -185,8 +188,7 @@ export default {
         }
         else if(this.modalType ===1){
           //删除功能的提交
-          alert("删除")
-
+          this.loading=true
           $.ajax({
             type: 'POST',
             url: 'http://127.0.0.1:8081/user/close',
@@ -196,6 +198,7 @@ export default {
             },
             success: (response) => {
             // 请求成功的处理逻辑
+            this.loading=false
             console.log("你是成功的人士");
             console.log(response);
             // 更改开关状态至绿色
@@ -203,6 +206,7 @@ export default {
             },
             error: (xhr, status, error) => {
             // 请求失败的处理逻辑
+            this.loading=false
             console.log("你是嗯嗯的人士");
             console.log('Error:', error);
             },
@@ -226,7 +230,7 @@ export default {
           type: 'warning'
           }).then(() => {
 
-            //
+            this.loading=true
             $.ajax({
               type: 'POST',
               url: 'http://127.0.0.1:8081/user/exit',
@@ -235,6 +239,7 @@ export default {
               },
               success: (response) => {
               // 请求成功的处理逻辑
+              this.loading=false
               console.log("你是成功的人士");
               console.log(response);
               // 更改开关状态至绿色
@@ -242,6 +247,7 @@ export default {
               },
               error: (xhr, status, error) => {
               // 请求失败的处理逻辑
+              this.loading=false
               console.log("你是嗯嗯的人士");
               console.log('Error:', error);
               },

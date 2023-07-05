@@ -69,7 +69,7 @@
                             </el-form> -->
                         </div>
 
-                        <el-table stripe height="630px" :data="TableDataa" style="width: 100%">
+                        <el-table v-loading="loading" stripe height="630px" :data="TableDataa" style="width: 100%">
                             
                             <el-table-column prop="UserID" label="用户ID" width="200">
                             </el-table-column>
@@ -117,6 +117,7 @@ import CommonHeader from '@/components/CommonHeader.vue';
 export default {
     data() {
         return {
+            loading:false,
             dialogVisible: false,
             modalType: 0,
             inputVisible: false,
@@ -177,6 +178,7 @@ export default {
     });
   },
   renderTable(data) {
+    this.TableDataa.splice(0);
   if (Array.isArray(data)) {
     this.TableDataa = data.reduce((acc, item) => {
       if (item['容器的状态'] === 2 || item['容器的状态'] === 3) {
@@ -221,6 +223,7 @@ export default {
                     Status: '',
                     //Usetime: []
                 }
+                this.getContdata()
                 this.$refs.form.resetFields()
             })
             this.dialogVisible = false
@@ -229,6 +232,7 @@ export default {
             this.handleClose()
         },
         handleDelete(row){
+            this.loading=true
             console.log(row)
             $.ajax({
             type: 'POST',
@@ -240,6 +244,7 @@ export default {
             },
             success: (response) => {
             // 请求成功的处理逻辑
+            this.loading=false
             console.log(response);
             alert("删除成功！")
             location.reload()
@@ -255,6 +260,7 @@ export default {
                 if (valid) { //valid为真 校验通过
                     // 后续对表单数据的处理
                     if (this.modalType === 0) { //是否是新增 而不是编辑
+                        this.loading=true
                         $.ajax({
                             type: 'POST',
                             url: 'http://127.0.0.1:8081/admin/add_container',
@@ -266,19 +272,25 @@ export default {
                             },
                             success: (response) => {
                             // 请求成功的处理逻辑
+                            this.loading=false
                             console.log(response);
+                            this.getContdata()
                             // 渲染数据到 el-table
-                            this.renderTable(response);
+                            //this.renderTable(response); // 更新表格数据
                             }
+                            
                         });
-                        
+                        this.handleClose(); // 关闭弹窗
+                        //location.reload()
+                        //关闭窗口
+                         //this.handleClose()
                     } else {
                         console.log('修改')
                     }
-                    this.getContdata();
-                    this.handleClose();
                 }
             })
+
+            
         },
         handleAdd() {
             this.modalType = 0
