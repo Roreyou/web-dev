@@ -220,6 +220,12 @@ export default {
         },
         handleDelete(row){
             console.log(row)
+
+            this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
             $.ajax({
             type: 'POST',
             url: 'http://127.0.0.1:8081/admin/delete_user',
@@ -238,8 +244,13 @@ export default {
             alert("删除失败！")
             location.reload()
             },
-
         });
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        });          
         this.getUserData();
        } 
     }

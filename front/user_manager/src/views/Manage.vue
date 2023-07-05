@@ -173,6 +173,7 @@ export default {
             success: (response) => {
             // 请求成功的处理逻辑
             this.loading=false
+            alert("已成功开机！")
             console.log("你是成功的人士");
             console.log(response);
             // 更改开关状态至绿色
@@ -181,6 +182,15 @@ export default {
             error: (xhr, status, error) => {
             // 请求失败的处理逻辑
             this.loading=false
+            if(error.msg==="密码不正确"){
+              alert("密码不正确,开机失败！")
+            }
+            else if(error.msg==="时间已超额"){
+              alert("时间已超额,开机失败！")
+            }
+            else{
+              alert("该容器正在被使用，无法开机！")
+            }
             console.log("你是嗯嗯的人士");
             console.log('Error:', error);
             },
@@ -199,6 +209,7 @@ export default {
             success: (response) => {
             // 请求成功的处理逻辑
             this.loading=false
+            alert("您已成功删除容器！")
             console.log("你是成功的人士");
             console.log(response);
             // 更改开关状态至绿色
@@ -207,6 +218,7 @@ export default {
             error: (xhr, status, error) => {
             // 请求失败的处理逻辑
             this.loading=false
+            alert("密码不正确，删除容器失败！")
             console.log("你是嗯嗯的人士");
             console.log('Error:', error);
             },
@@ -242,6 +254,12 @@ export default {
               this.loading=false
               console.log("你是成功的人士");
               console.log(response);
+              if(response.warning==="容器使用超出额度"){
+                alert("已成功关机，鉴于您已超出容器使用额度，您本月将无法使用服务器！")
+              }
+              else{
+                alert("已成功关机！")
+              }
               // 更改开关状态至绿色
               this.getUseGPUData();
               },
@@ -251,18 +269,8 @@ export default {
               console.log("你是嗯嗯的人士");
               console.log('Error:', error);
               },
-            });
-
-            this.$message({
-              type: 'success',
-              message: '关机成功!'
-            });
-          }).catch(() => {
-            this.$message({
-              type: 'info',
-              message: '已取消关机'
-            });          
-          });
+            });        
+          })
         }
       }
     },

@@ -232,6 +232,11 @@ export default {
             this.handleClose()
         },
         handleDelete(row){
+            this.$confirm('此操作将永久删除该容器, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
             this.loading=true
             console.log(row)
             $.ajax({
@@ -246,11 +251,18 @@ export default {
             // 请求成功的处理逻辑
             this.loading=false
             console.log(response);
-            alert("删除成功！")
+            alert("删除容器成功！")
             location.reload()
             },
             
         });
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        });
+
         this.getContdata();
        },
         // 提交用户表单
@@ -273,6 +285,7 @@ export default {
                             success: (response) => {
                             // 请求成功的处理逻辑
                             this.loading=false
+                            alert("新增容器成功")
                             console.log(response);
                             this.getContdata()
                             // 渲染数据到 el-table

@@ -137,7 +137,7 @@ export default {
                 ID: '',
                 Type: '',
                 Size: '',
-                Frame: []
+                Frame: ['tensorflow2.1.0+pythorch1.11+python3.6.9', 'tensorflow2.6.0+pythorch1.11+python3.9.0']
             },
             rules: {
                 ID: [
@@ -199,6 +199,12 @@ export default {
 
     handleDelete(row){
             console.log(row)
+
+            this.$confirm('此操作将永久删除该服务器, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
             $.ajax({
             type: 'POST',
             url: 'http://127.0.0.1:8081/admin/delete_server',
@@ -208,10 +214,15 @@ export default {
             success: (response) => {
             // 请求成功的处理逻辑
             console.log(response);
-            alert("删除成功！")
+            alert("删除GPU成功！")
             location.reload()
-            },
-            
+            },       
+        });
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
         });
         this.getUserData();
        },
@@ -236,6 +247,7 @@ export default {
                             // 请求成功的处理逻辑
                             console.log(response);
                             // 渲染数据到 el-table
+                            alert("新增GPU成功！")
                             this.renderTable(response);
                             }
                         });
@@ -255,6 +267,7 @@ export default {
                             // 请求成功的处理逻辑
                             console.log(response);
                             // 渲染数据到 el-table
+                            alert("修改GPU成功！")
                             this.renderTable(response);
                             }
                         });

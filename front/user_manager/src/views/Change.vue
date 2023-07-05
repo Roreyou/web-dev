@@ -104,10 +104,12 @@ import $ from 'jquery'
           },
           success: function(response) {
             // 请求成功的处理逻辑
+            alert("您已成功修改密码！")
             console.log(response);
           },
           error: function(xhr, status, error) {
             // 请求失败的处理逻辑
+            alert("原密码不正确！")
             console.log("Error:", error);
           }
         });
