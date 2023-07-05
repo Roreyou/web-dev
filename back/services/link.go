@@ -60,7 +60,7 @@ func GreateDocker(mid string, uid string, did string, pwd string) int {
 	}
 
 	// 连接SSH服务器
-	sshClient, err := ssh.Dial("tcp", "ssh.schoolresearch.one:21006", sshConfig)
+	sshClient, err := ssh.Dial("tcp", "172.16.108.78:2022", sshConfig)
 	if err != nil {
 		panic(err)
 	}

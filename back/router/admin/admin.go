@@ -71,3 +71,8 @@ func UpdateServerRoute(r *gin.Engine) {
 	r.LoadHTMLFiles("./no_right.html")                                      //调用中间件，用于进行权限认证
 	InitPRouter.POST("/update_server", controller.Update_ServiceController) //开始响应，在我们的控制器文件中调用我的处理函数
 }
+
+func ChangeRemainderRoute(r *gin.Engine) {
+	InitPRouter := r.Group("/admin")                                             //调用中间件，用于进行权限认证
+	InitPRouter.POST("/change_remainder", controller.Change_remainderController) //开始响应，在我们的控制器文件中调用我的处理函数
+}
