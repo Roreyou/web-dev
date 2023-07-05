@@ -214,15 +214,18 @@ export default {
                 },
                 success: (response) => {
                 // 请求成功的处理逻辑
+                this.getUserData();
                 console.log(response);
                 alert("恭喜您！该账户剩余额度已重置为10h！")
                 },
                 error: (xhr, status, error) => {
                 // 请求失败的处理逻辑
+                this.getUserData();
                 console.log('Error:', error);
                 alert("重置额度失败！")
                 },
             });
+            location.reload();
         },
         handleEdit(row) {
             console.log(row)

@@ -50,7 +50,7 @@
                                     @blur="tagInputConfirm"
                                     >
                                     </el-input>
-                                    <el-button v-else class="button-new-tag" size="small" @click="tagInput">+ New Tag</el-button>
+                                    
 
                                 </el-form-item>
                             </el-form>
@@ -289,7 +289,7 @@ export default {
                 Type: '',
                 Size: '',
                 SSH: '',
-                Frame: []
+                Frame: ['tensorflow2.1.0+pythorch1.11+python3.6.9', 'tensorflow2.6.0+pythorch1.11+python3.9.0']
                 }
                 this.$refs.form.resetFields()
             })

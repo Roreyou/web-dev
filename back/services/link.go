@@ -10,17 +10,24 @@ import (
 )
 
 var c int
+var d int
+var flag bool
 
-func IfuserTimeout(uid string) bool { //检查用户是否超额
+func IfuserTimeout(uid string) bool { //检查用户是否超额等
 	db := dao.Openmysql()
 	var ur dao.User_Info
-	db.Table("user_info").Where("user_id = ?", uid).First(&ur)
+	flag = false
+	if db.Table("user_info").Where("user_id = ?", uid).First(&ur).RecordNotFound() {
+		flag = true
+		return false
+	}
 	ut := ur.Remainder
 	uh := strings.Split(ut, "h")
 	h, _ := strconv.Atoi(uh[0])
 	um := strings.Split(uh[1], "m")
 	m, _ := strconv.Atoi(um[0])
 	db.Table("container").Where("(container_status=2 OR container_status=3) and user_id = ? ", uid).Count(&c)
+	db.Table("server_info").Count(&d)
 	return h == 0 && m < 5 //小于五分钟就超额了
 }
 
@@ -44,11 +51,16 @@ func StorecontainerInfo(imd int, psw string, cid string, mid int, uid int) {
 }
 
 func GreateDocker(mid string, uid string, did string, pwd string) int {
-
 	if IfuserTimeout(uid) {
 		return 1
 	}
-	fmt.Println("ye1")
+	machine_id, _ := strconv.ParseInt(mid, 10, 64)
+	if !(did == "1" || did == "2") {
+		flag = true
+	}
+	if d <= int(machine_id) || flag {
+		return 2
+	}
 	if c > 0 {
 		return 3
 	}

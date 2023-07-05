@@ -139,8 +139,18 @@
                 error: (xhr, status, error) => {
                 // 请求失败的处理逻辑
                 this.loading = false;
-                console.log('Error:', error);
-                alert("创建GPU失败！")
+                //alert("创建容器失败，请检查容器状态和时间额度")
+                if(xhr.responseJSON.msg==="时间已超额"){
+                  alert("时间已超额")
+                }
+                if(xhr.responseJSON.fail==="容器创建失败"){
+                  alert("容器创建失败")
+                }
+                if(xhr.responseJSON.msg==="已有容器存在，不能创建超过一个容器"){
+                  alert("已有容器存在，不能创建超过一个容器")
+                }
+                console.log('Error:', xhr.responseJSON.msg);
+                
                 },
               
     //           complete: () => {

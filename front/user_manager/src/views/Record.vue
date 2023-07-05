@@ -23,8 +23,8 @@
                     width="200px">
                 </el-table-column>
                 <el-table-column
-                    prop="本服务器累计租用时长"
-                    label="本次租用总时长"
+                    prop="本次租用总时长"
+                    label="本服务器累计租用时长"
                     width="200px">
                 </el-table-column>
                 <el-table-column
@@ -80,7 +80,7 @@ export default {
         '租用的机器ID': item['租用的机器ID'],
         '机器开始使用时间': item['机器开始使用时间'],
         '机器结束使用时间': item['结束租用服务器时间'],
-        '本次租用服务器的时间': item['本次租用服务器的时间'],
+        '本次租用总时长': item['本次租用服务器的时间'],
         '总共租用服务器时间': item['总共租用服务器时间'],
       }));
     },

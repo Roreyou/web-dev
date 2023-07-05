@@ -96,7 +96,33 @@ import $ from 'jquery'
         }
       };
     },
+    mounted(){
+      this.getUserInfo()
+    },
     methods: {
+      getUserInfo(){
+        $.ajax({
+        type: 'POST',
+        url: 'http://127.0.0.1:8081/user/info',
+        data: {
+          // 请求的参数
+          user_id: sessionStorage.getItem('user_id'),
+        },
+        success: (response) => {
+          // 请求成功的处理逻辑
+          console.log(response);
+          // 渲染数据到 el-table
+          console.log(response.remainder)
+          this.ruleForm.remainder = response.remainder
+          sessionStorage.setItem("remainder", response.remainder);
+        },
+        error: (xhr, status, error) => {
+          // 请求失败的处理逻辑
+          console.log('Error:', error);
+        },
+      });
+      },
+      
    submitForm(formName) {
             $.ajax({
           type: "POST",
