@@ -141,3 +141,11 @@ func Cut_Remainder(record Used_Record) {
 	new_remainder := remainder - (record.End_time.Sub(record.Start_time))
 	db.Table("user_info").Where("user_id= ?", record.User_id).Update("remainder", new_remainder.String())
 }
+
+func Change_remainder(c *gin.Context) {
+	db := Openmysql()
+	db.Model(&Used_Record{})
+	userid_string := c.PostForm("user_id")
+	user_id, _ := strconv.Atoi(userid_string)
+	db.Table("user_info").Where("user_id = ?", user_id).Update("remainder", "10h")
+}

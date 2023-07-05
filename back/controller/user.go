@@ -83,3 +83,10 @@ func Record_controller(c *gin.Context) {
 	c.JSON(http.StatusOK, recording_info)
 
 }
+
+func Change_remainderController(c *gin.Context) {
+	dao.Change_remainder(c)
+	c.JSON(http.StatusOK, gin.H{
+		"msg": "余额恢复成功",
+	})
+}
