@@ -1,2 +1,3 @@
 # web-dev
-中级实训web开发
+A web development project
+topic:a GPU manage platform
