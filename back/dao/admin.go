@@ -39,6 +39,8 @@ func Add_user(c *gin.Context) bool {
 	return true
 }
 
+/*
+//非原子操作
 func Delete_user(c *gin.Context) bool {
 	db := Openmysql()
 	db.AutoMigrate(&User_Info{})
@@ -80,6 +82,69 @@ func Delete_user(c *gin.Context) bool {
 	db.Close()
 	return true
 
+}
+*/
+
+// 原子操作
+func Delete_user(c *gin.Context) bool {
+    db := Openmysql()
+    defer db.Close() // 确保函数结束时关闭数据库连接
+
+    // 开始事务
+    tx := db.Begin()
+    if tx.Error != nil {
+        return false
+    }
+
+    tx.AutoMigrate(&User_Info{})
+    userid := c.PostForm("user_id")    // 返回的是string类型
+    user_id, _ := strconv.Atoi(userid) // 要转化成int类型
+    fmt.Println(user_id)
+
+    // 查询要删除的用户是否存在
+    var user User_Info
+    result := tx.Table("user_info").Where("user_id = ?", user_id).First(&user)
+    fmt.Println(user)
+    if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+        tx.Rollback()
+        return false
+    }
+    tx.Debug().Table("user_info").Where("user_id = ?", user_id).Delete(&user)
+
+    // 查询要删除的用户在container表中是否存在
+    var cont []Container
+    cont_result := tx.Table("container").Where("user_id = ?", user_id).Find(&cont)
+    fmt.Println(cont)
+    if errors.Is(cont_result.Error, gorm.ErrRecordNotFound) {
+        tx.Rollback()
+        return false
+    }
+    for i, singlecont := range cont {
+        fmt.Println(i)
+		if singlecont.Container_status == 3 || singlecont.Container_status == 2 {
+				DeleteContainerDAO(c)
+		}
+        
+    }
+    tx.Debug().Table("container").Where("user_id = ?", user_id).Delete(&cont)
+
+    // 查询要删除的用户在used_record表中是否存在
+    var used_record []Used_Record
+    record_result := tx.Table("used_record").Where("user_id = ?", user_id).Find(&used_record)
+    fmt.Println(used_record)
+    if errors.Is(record_result.Error, gorm.ErrRecordNotFound) {
+        tx.Rollback()
+        return false
+    }
+    tx.Debug().Table("used_record").Where("user_id = ?", user_id).Delete(&used_record)
+
+    // 提交事务
+    if err := tx.Commit().Error; err != nil {
+        tx.Rollback()
+        return false
+    }
+
+    return true
 }
 
 func Init_password(c *gin.Context) bool {
